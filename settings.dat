@@ -1,0 +1,6 @@
+# current working directory
+WORKING_DIRECTORY= /home/kaicheng/Desktop/RoDeO-master/Tests/SurrogateModels/SGEK/NACA0012
+# directory for the python scripts
+PYTHON_DIRECTORY= /home/kaicheng/Desktop/RoDeO-master/python
+# name of the configuration file
+CONFIGURATION_FILE= NACA0012.cfg
