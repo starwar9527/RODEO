@@ -832,7 +832,7 @@ void readFileToaString(std::string filename, std::string & stringCompleteFile){
 #if 0
 	cout<<stringCompleteFile;
 #endif
-
+	// cout<<stringCompleteFile;
 
 }
 

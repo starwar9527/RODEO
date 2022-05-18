@@ -109,6 +109,8 @@ void SurrogateModelData::readData(string inputFilename){
 
 	assert(isNotEmpty(inputFilename));
 
+	// cout << inputFilename << " name"<< endl;
+
 	outputToScreen.printMessage("Loading data from the file: " + inputFilename);
 
 	bool status = rawData.load(inputFilename.c_str(), csv_ascii);
@@ -162,9 +164,8 @@ void SurrogateModelData::readDataTest(string inputFilename){
 	outputToScreen.printMessage("Number of test samples = ", numberOfTestSamples);
 
 
-	XTest = XrawTest;
-
-
+	XTest = XrawTest.cols(0,dimension-1);
+	YTest = XrawTest.col(dimension);
 }
 
 
@@ -202,6 +203,7 @@ void SurrogateModelData::assignSampleInputMatrix(void){
 	assert(numberOfSamples>0);
 
 	X = rawData.submat(0,0,numberOfSamples-1, dimension-1);
+
 	Xraw = X;
 
 }
@@ -264,7 +266,11 @@ rowvec SurrogateModelData::getRowXTest(unsigned int index) const{
 
 }
 
+vec SurrogateModelData::getYTest(void) const{   // Modified by Kai
 
+	return YTest;
+
+}
 
 
 rowvec SurrogateModelData::getRowXRaw(unsigned int index) const{

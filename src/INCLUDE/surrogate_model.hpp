@@ -60,7 +60,7 @@ protected:
 
 	std::string filenameDataInput;
 	std::string filenameDataInputTest;
-
+	//std::string filenameDataOutput;  // Modified by Kai
 
 	std::string filenameTestResults;
 

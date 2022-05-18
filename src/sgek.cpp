@@ -43,6 +43,7 @@
 #include "sgek.hpp"
 #include "correlation_functions.hpp"
 
+
 #define ARMA_DONT_PRINT_ERRORS
 #include <armadillo>
 
@@ -190,7 +191,7 @@ void SGEKModel::initializeSurrogateModel(void){
 
 	ifInitialized = true;
 
-	std::cout << "GEK model initialization is done...\n";
+	std::cout << "SGEK model initialization is done...\n";
 
 	snum = 10;
     slicing(snum);
@@ -209,18 +210,16 @@ void SGEKModel::printHyperParameters(void) const{
 
 	printVector(GEK_weights,"GEK_weights");
 
-
 }
 
 void SGEKModel::saveHyperParameters(void) const{
 
-
-
 }
+
 void SGEKModel::loadHyperParameters(void){
 
-
 }
+
 void SGEKModel::train(void){
 
 	if(!ifInitialized){
@@ -228,25 +227,29 @@ void SGEKModel::train(void){
 		initializeSurrogateModel();
 
 	}
+	clock_t start, finish;
 
 	unsigned int dim = data.getDimension();
 
-	vec hyper_l = {0.0005, 0.2, 0.0005};   // lower bound
-	vec hyper_u = {2.5, 1, 2.5};           // upper bound
+	vec hyper_l = {0.0005*dim, 0.2, 0.0005*dim};   // lower bound
+	vec hyper_u = {2.5*dim, 1, 2.5*dim};           // upper bound
 
-	num = 10;
+    num = 10;
 
-	cout <<  "Start hyper-parameter optimization" << endl;
+	start = clock();
 
-	boxmin(hyper_l,hyper_u,num);   // Hooke Jeeves algorithm for hyper-parameter optimization
+	boxmin(hyper_l,hyper_u,num);        // Hooke Jeeves algorithm for hyper-parameter optimization
+
+	finish = clock();
+
+    cout << "SGEK model training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
 
 	GEK_weights = getTheta();
+
 	likelihood  = getLikelihood();
 
-	// original_likelihood_function(GEK_weights);
-
-	cout <<  "The optimal hyper-parameter is " << GEK_weights << endl;
-	cout <<  "The optimal likelihood is " << likelihood << endl;
+ //	cout <<  "The optimal hyper-parameter is " << GEK_weights << endl;
+ //	cout <<  "The optimal likelihood is " << likelihood << endl;
 
 #if 1
 	printVector(GEK_weights,"GEK_weights");
@@ -257,7 +260,7 @@ void SGEKModel::train(void){
 }
 
 
-void SGEKModel::slicing(unsigned int snum ){
+void SGEKModel::slicing(unsigned int snum ){  // Divide the training data into multiple slices
 
 	dim = data.getDimension();
 	unsigned int N = data.getNumberOfSamples();
@@ -303,7 +306,7 @@ void SGEKModel::slicing(unsigned int snum ){
 
 }
 
-void SGEKModel::original_likelihood_function(vec alpha){ //  Sliced likelihood function
+void SGEKModel::original_likelihood_function(vec alpha){ //  Original likelihood function
 
 	vec theta = alpha(1)*pow(sensitivity,alpha(2))+alpha(3);
 
@@ -420,11 +423,18 @@ double SGEKModel::sliced_likelihood_function(vec alpha){ //  Sliced likelihood f
 
 	}
 
+
 	for (unsigned int k=0; k< snum-2; k++){
 
 			n_1(k) = size(index(k+1),0);
 
 			X_1(k) = X.rows(index(k+1));
+
+			if (size(X_1(k),0)==1){
+
+				std::cout<<"ERROR: Samples size within slice must greater than 1\n";
+
+			}
 
 			upperDiagonalMatrixDot_1(k) = chol(correlationfunction.corrbiquadspline_gekriging(X_1(k),theta));
 
@@ -538,7 +548,6 @@ void SGEKModel::interpolateWithVariance(rowvec xp,double *ftildeOutput,double *s
 	/* solve the linear system R x = r by Cholesky matrices U and L*/
 	solveLinearSystemCholesky(upperDiagonalMatrixDot, R_inv_r, r);
 
-
 	*sSqrOutput = sigmaSquared*( 1.0 - dot(r,R_inv_r)+ ( pow( (dot(r,R_inv_F) -1.0 ),2.0)) / (dot(vectorOfF,R_inv_F) ) );
 
 }
@@ -572,12 +581,19 @@ double SGEKModel::computedR_dxi(rowvec x_i, rowvec x_j,int k) const{
 
 	xi = fabs(x_i(k)-x_j(k))*theta(k);       /* Modified by Kai Cheng */
 	ui  = sign(x_i(k)-x_j(k))*theta(k);
+
 	if (xi <= 0.4)
+
 		 { result = -ui*(-30*xi + 105*pow(xi,2) - 195.0/2*pow(xi,3))/(1 - 15*pow(xi,2) + 35*pow(xi,3) - 195.0/8*pow(xi,4))*R;}
+
     else if (xi < 1)
+
 		 { result = -ui*(-20.0/3 + 20*xi- 20*pow(xi,2) + 20.0/3*pow(xi,3))/(5/3 - 20.0/3*xi + 10*pow(xi,2) - 20.0/3*pow(xi,3) + 5.0/3*pow(xi,4))*R;}
+
 	else
+
 		 { result = 0;}
+
 	return result;
 }
 
@@ -608,19 +624,23 @@ double SGEKModel::computedR_dxj(rowvec x_i, rowvec x_j, int k) const {
 
 	xi = fabs(x_i(k)-x_j(k))*theta(k);     /* Modified by Kai Cheng */
 	ui  = sign(x_i(k)-x_j(k))*theta(k);
+
 	if (xi <= 0.4)
+
        { result = -ui*(-30*xi + 105*pow(xi,2) - 195.0/2*pow(xi,3))/(1 - 15*pow(xi,2) + 35*pow(xi,3) - 195.0/8*pow(xi,4))*R;}
+
     else if (xi < 1)
+
 	   { result = -ui*(-20.0/3 + 20*xi- 20*pow(xi,2) + 20.0/3*pow(xi,3))/(5.0/3 - 20.0/3*xi + 10*pow(xi,2) - 20.0/3*pow(xi,3) + 5.0/3*pow(xi,4))*R;}
+
 	else
+
 	   { result = 0;}
 
 	return result;
 }
 
-
 /*
- *
  * second derivative of R(x^i,x^j) w.r.t. x^i_l and x^j_k (hand derivation)
  * (for GEK)
  *
@@ -652,7 +672,9 @@ double SGEKModel::computedR_dxi_dxj(rowvec x_i, rowvec x_j, int l,int k) const{
 	double ui1;
 	double xi2;
 	double ui2;
+
 	vec theta = GEK_weights;
+
 	double R = computeCorrelation(x_i, x_j, theta);
 
 	if (k == l){
@@ -870,18 +892,37 @@ vec SGEKModel::computeCorrelationVectorDot(rowvec x) const{
 void SGEKModel::updateAuxilliaryFields(void){
 
 	unsigned int dim = data.getDimension();
-	unsigned int N = data.getNumberOfSamples();
+		unsigned int N = data.getNumberOfSamples();
 
-#if 0
-	cout<<"Updating auxiliary variables of the GEK model\n";
-#endif
-	vec ys = yGEK;
-	vec theta = GEK_weights;
-	mat X = data.getInputMatrix();
-	// computeCorrelationMatrixDot(theta);
+	#if 0
+		cout<<"Updating auxiliary variables of the GEK model\n";
+	#endif
 
-	correlationMatrixDot = correlationfunction.corrbiquadspline_gekriging(X,theta);
+		vec y = data.getOutputVector();
+		yGEK.set_size(N*(dim+1));
+		vec pd = zeros(N*dim) ;
+		mat gradientData = data.getGradientMatrix();
 
+		Bounds boxConstraints = data.getBoxConstraints();
+
+		for(unsigned int i=0; i<dim; i++){
+
+			vec gradx = gradientData.col(i);
+
+			for(unsigned int j=0; j<N; j++){
+
+				double xmin = boxConstraints.getLowerBound(i);
+				double xmax = boxConstraints.getUpperBound(i);
+				pd(i*N+j) = gradx(j)*( xmax - xmin )*dim;
+
+			}
+		}
+
+		yGEK = join_cols(y,pd);
+		vec theta = GEK_weights;
+		mat X = data.getInputMatrix();
+
+		correlationMatrixDot = correlationfunction.corrbiquadspline_gekriging(X,theta);
 
 #if 0
 
@@ -891,7 +932,6 @@ void SGEKModel::updateAuxilliaryFields(void){
 		vec Rdotcol = correlationMatrixDot.col(i);
 		cout<<"Column: "<<i<<"\n";
 		printVector(Rdotcol);
-
 
 	}
 
@@ -917,17 +957,15 @@ void SGEKModel::updateAuxilliaryFields(void){
 
 	vec R_inv_ys(N*(dim+1)); R_inv_ys.fill(0.0);
 
-	solveLinearSystemCholesky(upperDiagonalMatrixDot, R_inv_ys, ys);    /* solve R x = ys */
+	solveLinearSystemCholesky(upperDiagonalMatrixDot, R_inv_ys, yGEK);    /* solve R x = ys */
 
 	R_inv_F = zeros(N*(dim+1));
 
-
 	solveLinearSystemCholesky(upperDiagonalMatrixDot, R_inv_F, vectorOfF);      /* solve R x = F */
-
 
 	beta0 = (1.0/dot(vectorOfF,R_inv_F)) * (dot(vectorOfF,R_inv_ys));
 
-	vec ys_min_betaF = ys - beta0*vectorOfF;
+	vec ys_min_betaF = yGEK - beta0*vectorOfF;
 
 
 	/* solve R x = ys-beta0*I */
@@ -942,26 +980,23 @@ void SGEKModel::updateAuxilliaryFields(void){
 
 void SGEKModel::addNewSampleToData(rowvec newsample){
 
-
 	/* avoid points that are too close to each other */
 
 		mat rawData = data.getRawData();
+		//bool flagTooClose= checkifTooCLose(newsample, rawData);
 
-		bool flagTooClose= checkifTooCLose(newsample, rawData);
+		//if(!flagTooClose){
 
+	    appendRowVectorToCSVData(newsample, filenameDataInput);
 
-		if(!flagTooClose){
+	    updateModelWithNewData();
 
-			appendRowVectorToCSVData(newsample, filenameDataInput);
+		//}
+	//	else{
 
-			updateModelWithNewData();
+	//		std::cout<<"WARNING: The new sample is too close to a sample in the training data, it is discarded!\n";
 
-		}
-		else{
-
-			std::cout<<"WARNING: The new sample is too close to a sample in the training data, it is discarded!\n";
-
-		}
+	//	}
 
 }
 
@@ -986,7 +1021,6 @@ void SGEKModel::updateModelWithNewData(void){
 	vectorOfF.set_size(N*(dim+1));
 	vectorOfF.fill(1.0);
 
-
 	updateAuxilliaryFields();
 
 }
@@ -998,7 +1032,6 @@ void SGEKModel::resetDataObjects(void){
 	R_inv_F.reset();
 	R_inv_ys_min_beta.reset();
 	vectorOfF.reset();
-
 	beta0 = 0.0;
 	sigmaSquared = 0.0;
 
@@ -1046,8 +1079,6 @@ void SGEKModel::calculateExpectedImprovement(CDesignExpectedImprovement &current
 
 			currentDesign.objectiveFunctionValue = ftilde;
 			currentDesign.valueExpectedImprovement = expectedImprovementValue;
-
-
 }
 
 
@@ -1072,7 +1103,7 @@ void SGEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 	hyper_up  = hyper_u;                  // upper bound
 
 
-	 //#pragma omp parallel for
+	#pragma omp parallel for
 	for (unsigned int kk=0;kk<num;kk++){
 
 	  start(hyper.col(kk),hyper_lb,hyper_up);
@@ -1121,6 +1152,7 @@ void SGEKModel::start(vec hyper_in, vec hyper_l, vec hyper_u){
 	  likelihood_cur = sliced_likelihood_function(hyper_cur);
 
 	  numberOfIteration = 0;
+
       hyperoptimizationHistory = zeros(dim_a+2,200*dim);
 
 	  hyperoptimizationHistory.col(numberOfIteration) = join_cols(hyper_cur, vec { likelihood_cur, 1.0} );
@@ -1155,11 +1187,8 @@ void SGEKModel::explore(vec hyper_1, double likelihood_1){
     	   hyper_par(j) = std::min(hyper_up(j),hyper_cur(j)*DD);
        }
 
-      // cout << hyper_par << endl;
 
        likelihood = sliced_likelihood_function(hyper_par);
-
-      // cout << likelihood << endl;
 
        numberOfIteration++;
        hyperoptimizationHistory.col(numberOfIteration)= join_cols(hyper_par, vec { likelihood, 2});

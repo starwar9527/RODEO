@@ -43,6 +43,7 @@ using namespace arma;
 class ConfigKey{
 
 public:
+
 	std::string name;
 	std::string type;
 
@@ -100,7 +101,6 @@ public:
 	std::vector<std::string> getConfigKeyVectorStringValue(std::string) const;
 	vec getConfigKeyVectorDoubleValue(std::string) const;
 	std::string getConfigKeyStringVectorValueAtIndex(std::string, unsigned int) const;
-
 
 
 	void abortifConfigKeyIsNotSet(std::string key) const;

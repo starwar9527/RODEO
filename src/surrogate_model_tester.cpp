@@ -251,8 +251,6 @@ void SurrogateModelTester::setFileNameTrainingDataLowFidelity(string filename){
 }
 
 
-
-
 void SurrogateModelTester::setFileNameTestData(string filename){
 
 	assert(isNotEmpty(filename));

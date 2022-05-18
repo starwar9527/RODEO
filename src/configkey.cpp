@@ -49,7 +49,6 @@ ConfigKey::ConfigKey(std::string name, std::string type){
 	this->name = name;
 	this->type = type;
 
-
 }
 
 
@@ -451,9 +450,6 @@ vec ConfigKeyList::getConfigKeyVectorDoubleValue(std::string key) const{
 		return emptyVector;
 	}
 
-
-
-
 }
 
 
@@ -465,6 +461,7 @@ std::string ConfigKeyList::getConfigKeyStringVectorValueAtIndex(std::string key,
 	std::string emptyString;
 
 	ConfigKey keyFound = getConfigKey(key);
+
 	assert(keyFound.type == "stringVector");
 
 	if(indx>=keyFound.vectorStringValue.size()){
@@ -495,9 +492,6 @@ void ConfigKeyList::printKeywords(void) const{
 
 	}
 
-
-
-
 }
 
 void ConfigKeyList::abortifConfigKeyIsNotSet(std::string key) const{
@@ -513,9 +507,7 @@ bool ConfigKeyList::ifConfigKeyIsSet(std::string key) const{
 
 	ConfigKey keyword = getConfigKey(key);
 
-
 	return keyword.ifValueSet;
-
 
 }
 
@@ -526,6 +518,8 @@ int ConfigKeyList::searchKeywordInString(std::string s) const{
 #if 0
 	std::cout<<"Searching in string = "<<s<<"\n";
 #endif
+
+
 
 	int indx = 0;
 	for(auto it = std::begin(keywordList); it != std::end(keywordList); ++it) {
@@ -607,8 +601,12 @@ void ConfigKeyList::parseString(std::string inputString){
 		getline(iss,singleLine,'\n');
 
 		singleLine = removeSpacesFromString(singleLine);
+
+		// cout << singleLine << endl;
+
 		int indxKeyword = searchKeywordInString(singleLine);
 
+		 // cout << indxKeyword << endl;
 
 		if(indxKeyword != -1){
 

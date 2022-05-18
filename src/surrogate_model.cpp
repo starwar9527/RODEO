@@ -364,8 +364,6 @@ void SurrogateModel::printSurrogateModel(void) const{
 
 
 
-
-
 rowvec SurrogateModel::getRowX(unsigned int index) const{
 
 	return data.getRowX(index);
@@ -421,8 +419,11 @@ void SurrogateModel::tryOnTestData(void) const{
 
 	output.printMessage("Surrogate test results", results);
 
-	//output.printMessage("Mean squared error", results);
+	vec testData = data.getYTest();
 
+	double mse = mean((testData-results.col(dim))%(testData-results.col(dim)))/var(testData);
+
+    cout << "Test relative mean squared error is " << mse <<  endl;
 
 }
 

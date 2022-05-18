@@ -299,6 +299,7 @@ void Optimizer::evaluateConstraints(Design &d){
 void Optimizer::addConstraintValuesToDoEData(Design &d) const{
 
 	unsigned int countConstraintWithGradient = 0;
+
 	for (auto it = constraintFunctions.begin(); it != constraintFunctions.end(); it++){
 
 		std::string filenameCVS = it->getName()+".csv";
@@ -313,11 +314,15 @@ void Optimizer::addConstraintValuesToDoEData(Design &d) const{
 
 
 			rowvec saveBuffer(2*dimension+1);
+
 			copyRowVector(saveBuffer,d.designParameters);
+
 			saveBuffer(dimension) = d.constraintTrueValues(it->getID());
 
 			rowvec gradient = d.constraintGradients[countConstraintWithGradient];
+
 			countConstraintWithGradient++;
+
 			copyRowVector(saveBuffer,gradient,dimension+1);
 
 			appendRowVectorToCSVData(saveBuffer,filenameCVS);
@@ -326,10 +331,12 @@ void Optimizer::addConstraintValuesToDoEData(Design &d) const{
 
 		}else{
 
-
 			rowvec saveBuffer(dimension+1);
+
 			copyRowVector(saveBuffer,d.designParameters);
+
 			saveBuffer(dimension) = d.constraintTrueValues(it->getID());
+
 			appendRowVectorToCSVData(saveBuffer,filenameCVS);
 
 
@@ -776,6 +783,7 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 		designToBeTried.generateRandomDesignVector(lowerBoundsForEIMaximization, upperBoundsForEIMaximization);
 
 		objFun.calculateExpectedImprovement(designToBeTried);
+
 		addPenaltyToExpectedImprovementForConstraints(designToBeTried);
 
 #if 0
@@ -802,6 +810,7 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 		designToBeTried.generateRandomDesignVectorAroundASample(designWithMaxEI.dv, lowerBoundsForEIMaximization, upperBoundsForEIMaximization);
 
 		objFun.calculateExpectedImprovement(designToBeTried);
+
 		addPenaltyToExpectedImprovementForConstraints(designToBeTried);
 
 #if 0
@@ -1033,13 +1042,17 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 	initializeSurrogates();
 
+	howOftenTrainModels = 1 ;
+
+	clock_t start, finish;
+
 
 	while(1){
 
 
 		iterOpt++;
 
-        cout << iterOpt <<endl;
+        cout <<"Number of iterations is " << iterOpt <<endl;
 
 #if 0
 		printf("Optimization Iteration = %d\n",iterOpt);
@@ -1048,10 +1061,17 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 		if(simulationCount%howOftenTrainModels == 0) {
 
-			cout << "start training surrogate model"<< endl;
-			trainSurrogates();
-			cout << "training is over"<< endl;
+			//cout << "Start training surrogate model"<< endl;
 
+			//start = clock();
+
+			trainSurrogates();
+
+			//finish = clock();
+
+			//cout << "Training is over"<< endl;
+
+			//cout << "Training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
 		}
 
 		if(iterOpt%10 == 0){
@@ -1060,16 +1080,16 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 		}
 
-		clock_t start, finish;
 		start = clock();
-		findTheMostPromisingDesign();
+		   findTheMostPromisingDesign();    // find the optimal next point with maximal EI
         finish = clock();
-		cout << "time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
 
-		start = clock();
-		CDesignExpectedImprovement optimizedDesignGradientBased = MaximizeEIGradientBased(theMostPromisingDesigns.at(0));
-		finish = clock();
-		cout << "time is " << (double)(finish-start)/CLOCKS_PER_SEC   <<endl;
+		cout << "The time for finding most promosing design point is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
+
+		//start = clock();
+		 CDesignExpectedImprovement optimizedDesignGradientBased = MaximizeEIGradientBased(theMostPromisingDesigns.at(0));
+		//finish = clock();
+		//cout << "time is " << (double)(finish-start)/CLOCKS_PER_SEC   <<endl;
 
 #if 0
 		optimizedDesignGradientBased.print();

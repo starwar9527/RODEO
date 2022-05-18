@@ -69,6 +69,7 @@ RoDeODriver::RoDeODriver(){
 	configKeysObjectiveFunction.add(ConfigKey("MARKER_FOR_GRADIENT","stringVector") );
 	configKeysObjectiveFunction.add(ConfigKey("NUMBER_OF_TRAINING_ITERATIONS","int") );
 	configKeysObjectiveFunction.add(ConfigKey("MULTILEVEL_SURROGATE","string") );
+	configKeysObjectiveFunction.add(ConfigKey("SURROGATE_OBJ","stringVector") ); // Modified by Kai
 
 	/* Keywords for constraints */
 
@@ -83,8 +84,7 @@ RoDeODriver::RoDeODriver(){
 	configKeysConstraintFunction.add(ConfigKey("MARKER_FOR_GRADIENT","stringVector") );
 	configKeysConstraintFunction.add(ConfigKey("NUMBER_OF_TRAINING_ITERATIONS","int") );
 	configKeysConstraintFunction.add(ConfigKey("MULTILEVEL_SURROGATE","string") );
-
-
+	configKeysConstraintFunction.add(ConfigKey("SURROGATE_CON","stringVector") ); // Modified by Kai
 
 
 	/* Other keywords */
@@ -170,7 +170,9 @@ void RoDeODriver::readConfigFile(void){
 
 	std::string stringCompleteFile;
 
+
 	readFileToaString(configFileName, stringCompleteFile);
+
 
 	if(ifDisplayIsOn()){
 
@@ -184,8 +186,6 @@ void RoDeODriver::readConfigFile(void){
 	extractObjectiveFunctionDefinitionFromString(stringCompleteFile);
 
 	extractConstraintDefinitionsFromString(stringCompleteFile);
-
-
 
 	checkConsistencyOfConfigParams();
 }
@@ -536,7 +536,7 @@ void RoDeODriver::parseConstraintDefinition(std::string inputString){
 	std::string marker;
 	std::string markerGradient;
 	std::string ifGradient;
-
+	std::string surrogatetype;  // Modified by Kai
 
 	configKeysConstraintFunction.parseString(inputString);
 
@@ -545,12 +545,8 @@ void RoDeODriver::parseConstraintDefinition(std::string inputString){
 	printKeywordsConstraint();
 #endif
 
-
 	definitionBuffer = configKeysConstraintFunction.getConfigKeyStringValue("DEFINITION");
 	designVectorFilename = configKeysConstraintFunction.getConfigKeyStringValue("DESIGN_VECTOR_FILE");
-
-
-
 
 	executableName = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("EXECUTABLE",0);
 	outputFilename = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("OUTPUT_FILE",0);
@@ -558,7 +554,7 @@ void RoDeODriver::parseConstraintDefinition(std::string inputString){
 	marker = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("MARKER",0);
 	markerGradient = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("MARKER_FOR_GRADIENT",0);
 	ifGradient = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("GRADIENT",0);
-
+	surrogatetype = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("SURROGATE_CON",0); // Modified by Kai
 
 	ConstraintDefinition result(definitionBuffer);
 	result.designVectorFilename = designVectorFilename;
@@ -567,6 +563,7 @@ void RoDeODriver::parseConstraintDefinition(std::string inputString){
 	result.path = exePath;
 	result.marker = marker;
 	result.markerForGradient = markerGradient;
+	result.surrogatetype = surrogatetype;
 
 	result.ID = numberOfConstraints;
 	numberOfConstraints++;
@@ -636,11 +633,12 @@ void RoDeODriver::parseObjectiveFunctionDefinition(std::string inputString){
 	std::string gradient;
 	std::string marker;
 	std::string markerGradient;
-
+	std::string surrogatetype;
 	std::string multilevel;
 
+    //cout << "eee" << endl;
 	configKeysObjectiveFunction.parseString(inputString);
-
+	//cout << "eee1" << endl;
 
 
 #if 0
@@ -659,9 +657,9 @@ void RoDeODriver::parseObjectiveFunctionDefinition(std::string inputString){
 	marker =  configKeysObjectiveFunction.getConfigKeyStringVectorValueAtIndex("MARKER",0);
 	markerGradient = configKeysObjectiveFunction.getConfigKeyStringVectorValueAtIndex("MARKER_FOR_GRADIENT",0);
 	gradient = configKeysObjectiveFunction.getConfigKeyStringVectorValueAtIndex("GRADIENT",0);
+	surrogatetype = configKeysObjectiveFunction.getConfigKeyStringVectorValueAtIndex("SURROGATE_OBJ",0);  // Modified by Kai
 
-
-
+    // cout <<  surrogatetype << endl;
 
 	objectiveFunction.name = name;
 	objectiveFunction.designVectorFilename =  designVectorFilename;
@@ -671,7 +669,7 @@ void RoDeODriver::parseObjectiveFunctionDefinition(std::string inputString){
 	objectiveFunction.outputFilename = outputFilename;
 	objectiveFunction.marker = marker;
 	objectiveFunction.markerForGradient = markerGradient;
-
+	objectiveFunction.surrogatetype = surrogatetype;
 
 
 	if(checkIfOn(gradient)){
@@ -755,8 +753,6 @@ void RoDeODriver::parseObjectiveFunctionDefinition(std::string inputString){
 	}
 	objectiveFunction.ifDefined = true;
 
-
-
 }
 
 
@@ -770,6 +766,7 @@ void RoDeODriver::extractObjectiveFunctionDefinitionFromString(std::string input
 	}
 
 	std::size_t foundObjectiveFunction = inputString.find("OBJECTIVE_FUNCTION");
+
 	if (foundObjectiveFunction != std::string::npos){
 
 		if(ifDisplayIsOn()){
@@ -786,12 +783,11 @@ void RoDeODriver::extractObjectiveFunctionDefinitionFromString(std::string input
 
 		std::size_t foundRightBracket = inputString.find("}", foundLeftBracket);
 
+
 		stringBufferObjectiveFunction.assign(inputString,foundLeftBracket+1,foundRightBracket - foundLeftBracket -1);
 
-		parseObjectiveFunctionDefinition(stringBufferObjectiveFunction);
 
-
-
+        parseObjectiveFunctionDefinition(stringBufferObjectiveFunction);
 
 	}
 
@@ -805,13 +801,6 @@ void RoDeODriver::extractObjectiveFunctionDefinitionFromString(std::string input
 
 
 	}
-
-
-
-
-
-
-
 
 }
 
@@ -876,6 +865,7 @@ void RoDeODriver::extractConfigDefinitionsFromString(std::string inputString){
 		singleLine = removeSpacesFromString(singleLine);
 		int indxKeyword = configKeys.searchKeywordInString(singleLine);
 
+		//cout << singleLine << "hh"  <<endl;
 
 		if(indxKeyword != -1){
 
@@ -1344,6 +1334,9 @@ void RoDeODriver::runSurrogateModelTest(void){
 
 	surrogateTest.setFileNameTestData(filenameTestData);
 
+	//std::string filenameTrainingData = configKeys.getConfigKeyStringValue("FILENAME_TEST_OUTPUT"); // Modified by Kai
+
+   // surrogateTest.setFileNameTestOutput(filenameTestOutput);                                            // Modified by Kai
 
 
 	if(configKeys.ifConfigKeyIsSet("LOWER_BOUNDS") && configKeys.ifConfigKeyIsSet("UPPER_BOUNDS")){

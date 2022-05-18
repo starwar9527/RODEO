@@ -64,6 +64,7 @@ private:
 
 	mat XrawTest;
 	mat XTest;
+    vec YTest;
 
 	OutputDevice outputToScreen;
 	Bounds boxConstraints;
@@ -106,6 +107,7 @@ public:
 	rowvec getRowXTest(unsigned int index) const;
 	rowvec getRowRawData(unsigned int index) const;
 	rowvec getRowGradient(unsigned int index) const;
+	vec getYTest(void) const;
 
 	mat getInputMatrix(void) const;
 

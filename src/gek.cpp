@@ -224,19 +224,27 @@ void GEKModel::train(void){
 
 	unsigned int dim = data.getDimension();
 
+	vec hyper_l = 0.0005*dim*ones(dim,1);
+	vec hyper_u = 5*dim*ones(dim,1);
 
-	vec hyper_l = 0.0005*ones(dim,1);
-	vec hyper_u = 5*ones(dim,1);
-	num = 10;
+	num = 10;                       // Multiple starts
+
+	clock_t start, finish;
+
+	start = clock();
 
 	boxmin(hyper_l,hyper_u,num);    // Hooke Jeeves algorithm for hyper-parameter optimization
 
-	GEK_weights = getTheta();
-	likelihood  = getLikelihood();
-	// likelihood_function(GEK_weights);
+	finish = clock();
 
-	cout <<  "The optimal hyper-parameter is " << GEK_weights << endl;
-	cout <<  "The corresponding likelihood value is " << likelihood << endl;
+	cout << "GEK model training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
+
+	GEK_weights = getTheta();
+
+	likelihood  = getLikelihood();
+
+//	cout <<  "The optimal hyper-parameter is " << GEK_weights << endl;
+//	cout <<  "The corresponding likelihood value is " << likelihood << endl;
 
 #if 1
 	printVector(GEK_weights,"GEK_weights");
@@ -254,8 +262,6 @@ double GEKModel::likelihood_function(vec theta){
 	mat X = data.getInputMatrix();
 
 	correlationMatrixDot = correlationfunction.corrbiquadspline_gekriging(X,theta);
-
-	// cout << "correlation matrix size " << size(correlationMatrixDot) <<  endl;
 
 	upperDiagonalMatrixDot = chol(correlationMatrixDot);
 
@@ -767,9 +773,9 @@ void GEKModel::addNewSampleToData(rowvec newsample){
 
 	//if(!flagTooClose){
 
-		appendRowVectorToCSVData(newsample, filenameDataInput);
+	appendRowVectorToCSVData(newsample, filenameDataInput);
 
-		updateModelWithNewData();
+	updateModelWithNewData();
 
 	//}
 	//else{
@@ -883,7 +889,8 @@ void GEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 	hyper_lb  = hyper_l;    //  lower bound
 	hyper_up  = hyper_u;    //  upper bound
 
-// #pragma omp parallel for
+
+	#pragma omp parallel for
 	for (unsigned int kk=0;kk<num;kk++){
 
 	  start(hyper.col(kk),hyper_lb,hyper_up);

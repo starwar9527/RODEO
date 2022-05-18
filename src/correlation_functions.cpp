@@ -53,10 +53,6 @@ mat Correlationfunction::corrbiquadspline_gekriging(mat &X, vec theta){
 	unsigned int dim = size(X,1);
 	unsigned int m   = size(X,0);
 
-	//data.normalizeSampleInputMatrix;
-
-	// mat x = data.getInputMatrix();
-
 	mat correlationMatrix = zeros(m*(dim+1),m*(dim+1));
 
 	unsigned int mzmax = m*(m-1)/2;                /*  number of non-zero distances  */

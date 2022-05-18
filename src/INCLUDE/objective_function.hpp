@@ -54,6 +54,8 @@ public:
 	std::string outputFilename;
 	std::string marker;
 	std::string markerForGradient;
+	std::string surrogatetype;  // Modified by Kai
+
 
 	/* These are required only for multi-level option */
 	std::string executableNameLowFi;
@@ -105,7 +107,7 @@ protected:
 	std::string fileNameInputReadLowFi;
 	std::string readMarkerLowFi;
 	std::string readMarkerAdjointLowFi;
-
+	std::string surrogatetype;  // Modified by Kai
 	std::string fileNameTrainingDataForSurrogate;
 
 
@@ -147,7 +149,6 @@ protected:
 	bool checkIfMarkersAreNotSet(void) const;
 
 public:
-
 
 	ObjectiveFunction(std::string, unsigned int);
 	ObjectiveFunction();

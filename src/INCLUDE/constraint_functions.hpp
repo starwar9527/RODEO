@@ -53,6 +53,7 @@ public:
 	std::string outputFilename;
 	std::string marker;
 	std::string markerForGradient;
+	std::string surrogatetype;
 
 	/* These are required only for multi-level option */
 	std::string executableNameLowFi;

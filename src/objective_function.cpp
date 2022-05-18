@@ -190,6 +190,8 @@ ObjectiveFunction::ObjectiveFunction(){
 
 	assert(ifDefinitionIsSet);
 
+	cout << "Fitting objective function with "<< surrogatetype << endl;
+
 	if(ifMultilevel){
 
 		output.printMessage("Binding the surrogate model with the Multi-Level modeĺ...");
@@ -206,18 +208,33 @@ ObjectiveFunction::ObjectiveFunction(){
 		surrogate = &surrogateModel;
 
 	}
-	else{
-		//surrogateModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
+
+	else if (surrogatetype == "gradient_enhanced_kriging"){
+
 		gekModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
 		output.printMessage("Binding the surrogate model with the gradient enhanced Kriging modeĺ...");
-		surrogate = &gekModel;
+	    surrogate = &gekModel;
 		surrogate->setGradientsOn();
-		//surrogateModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
-		//output.printMessage("Binding the surrogate model with the Agrregation modeĺ...");
-		//surrogate = &surrogateModelGradient;
-	}
 
+	     }
 
+	else if (surrogatetype == "sliced_gradient_enhanced_kriging"){
+
+		gekModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
+		output.printMessage("Binding the surrogate model with the sliced gradient enhanced Kriging modeĺ...");
+		surrogate = &sgekModel;
+		surrogate->setGradientsOn();
+
+		 }
+
+	else {
+
+		surrogateModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
+		surrogateModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
+		output.printMessage("Binding the surrogate model with the Agrregation modeĺ...");
+		surrogate = &surrogateModelGradient;
+
+	   }
 }
 
 
@@ -228,7 +245,7 @@ void ObjectiveFunction::setParametersByDefinition(ObjectiveFunctionDefinition de
 	fileNameDesignVector = definition.designVectorFilename;
 	fileNameInputRead = definition.outputFilename;
 	ifGradientAvailable = definition.ifGradient;
-
+	surrogatetype = definition.surrogatetype;
 
 	if(isNotEmpty(definition.marker)){
 

@@ -35,7 +35,6 @@
 #include<stdio.h>
 #include<iostream>
 
-
 #include "optimization.hpp"
 #include "test_functions.hpp"
 #include "linear_regression.hpp"
