@@ -1103,7 +1103,8 @@ void SGEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 	hyper_up  = hyper_u;                  // upper bound
 
 
-	#pragma omp parallel for
+	//#pragma omp parallel for
+	
 	for (unsigned int kk=0;kk<num;kk++){
 
 	  start(hyper.col(kk),hyper_lb,hyper_up);
