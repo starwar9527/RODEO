@@ -110,6 +110,7 @@ void ConstraintDefinition::print(void) const{
 	std::cout<< "Design vector filename = "<<designVectorFilename<<"\n";
 	std::cout<< "Output filename = "<<outputFilename<<"\n";
 	std::cout<< "Executable name = "<<executableName<<"\n";
+	std::cout<< "Surrogate model type  = "<<surrogatetype<<"\n";  // Created by Kai
 
 	if(!path.empty()){
 
@@ -481,14 +482,17 @@ void ConstraintFunction::addDesignToData(Design &d){
 
 		rowvec newsample = d.constructSampleConstraintWithGradient(ID);
 
-		surrogateModelGradient.addNewSampleToData(newsample);
+	//	surrogateModelGradient.addNewSampleToData(newsample);
 
+		surrogate->addNewSampleToData(newsample);
 	}
 	else{
 
 		rowvec newsample = d.constructSampleConstraint(ID);
 
-		surrogateModel.addNewSampleToData(newsample);
+		//surrogateModel.addNewSampleToData(newsample);
+
+		surrogate->addNewSampleToData(newsample);
 	}
 
 

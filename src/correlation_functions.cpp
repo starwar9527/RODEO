@@ -73,7 +73,7 @@ mat Correlationfunction::corrbiquadspline_gekriging(mat &X, vec theta){
 
   // Kriging correlation function
 
-	unsigned int  mn = mzmax*dim;
+	unsigned long  mn = mzmax*dim;
 	vec ss = zeros(mn);
 	vec xi = reshape(abs(d) % repmat(theta.t(),mzmax,1),mn,1);
 
@@ -93,7 +93,8 @@ mat Correlationfunction::corrbiquadspline_gekriging(mat &X, vec theta){
     uvec idx = find(r > 0);
 
     vec o = linspace(0,m-1,m);
-    double epsilonKriging = 2.220446049250313e-16;
+
+    double epsilonKriging = 2.220446049250313e-12;
     double mu = (10+m)*epsilonKriging;
 
     mat location     = join_cols(ij.rows(idx),repmat(o,1,2));
@@ -197,7 +198,7 @@ void Correlationfunction::corrbiquadspline_gekriging_vec(mat &xtest, mat &X, vec
 
 	mat correlationVec = zeros(m1,m*(dim+1));
 
-	unsigned int mzmax = m*m1;                     /*  number of non-zero distances  */
+	unsigned long mzmax = m*m1;                              /*  number of non-zero distances  */
 	mat d  = zeros(mzmax, dim);                    /* initialize matrix with distances */
 
 	for(unsigned int k=1; k<m1;k++){
@@ -206,7 +207,7 @@ void Correlationfunction::corrbiquadspline_gekriging_vec(mat &xtest, mat &X, vec
 
   // Kriging correlation function
 
-	unsigned int  mn = m1*dim;
+	unsigned long  mn = m1*dim;
 	vec ss = zeros(mn);
 	vec xi = reshape(abs(d) % repmat(theta.t(),mzmax,1),mn,1);
 
@@ -350,7 +351,7 @@ void Correlationfunction::corrgaussian_gekriging_vec(mat &xtest,mat &X, vec thet
 
 	mat correlationVec = zeros(m1,m*(dim+1));
 
-    unsigned int mzmax = m*m1;                     /*  number of non-zero distances  */
+	unsigned long mzmax = m*m1;                     /*  number of non-zero distances  */
     mat d  = zeros(mzmax, dim);                    /* initialize matrix with distances */
 
 	for(unsigned int k=1; k<m1;k++){
@@ -359,7 +360,7 @@ void Correlationfunction::corrgaussian_gekriging_vec(mat &xtest,mat &X, vec thet
 
 	// Kriging correlation function
 
-	unsigned int  mn = mzmax*dim;
+	unsigned long  mn = mzmax*dim;
 
 	mat td = d % d % repmat(-theta.t(),mzmax,1);
 	vec r = exp(sum(td,1));
@@ -431,7 +432,7 @@ void Correlationfunction::corrgaussian_kriging_vec(mat &xtest, mat &X, vec theta
 
 	mat correlationVec = zeros(m1,m);
 
-	unsigned int mzmax = m*m1;                     /*  number of non-zero distances  */
+	unsigned long mzmax = m*m1;                     /*  number of non-zero distances  */
 	mat d  = zeros(mzmax, dim);                    /* initialize matrix with distances */
 
 	for(unsigned int k=1; k<m1;k++){
@@ -440,7 +441,7 @@ void Correlationfunction::corrgaussian_kriging_vec(mat &xtest, mat &X, vec theta
 
 	// Kriging correlation function
 
-	unsigned int  mn = mzmax*dim;
+	unsigned long  mn = mzmax*dim;
 
 	mat td = d % d % repmat(-theta.t(),mzmax,1);
 	vec r = exp(sum(td,1));
@@ -517,7 +518,7 @@ void Correlationfunction::corrbiquadspline_kriging_vec(mat &xtest, mat &X,vec th
 
 	mat correlationVec = zeros(m1,m);
 
-	unsigned int mzmax = m*m1;                     /*  number of non-zero distances  */
+	unsigned long mzmax = m*m1;                     /*  number of non-zero distances  */
 	mat d  = zeros(mzmax, dim);                    /* initialize matrix with distances */
 
 	for(unsigned int k=1; k<m1;k++){
@@ -526,7 +527,7 @@ void Correlationfunction::corrbiquadspline_kriging_vec(mat &xtest, mat &X,vec th
 
   // Kriging correlation function
 
-	unsigned int  mn = m1*dim;
+	unsigned long  mn = m1*dim;
 	vec ss = zeros(mn);
 	vec xi = reshape(abs(d) % repmat(theta.t(),mzmax,1),mn,1);
 

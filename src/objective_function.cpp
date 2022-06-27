@@ -190,10 +190,8 @@ ObjectiveFunction::ObjectiveFunction(){
 
 	assert(ifDefinitionIsSet);
 
-	cout << "Fitting objective function with "<< surrogatetype << endl;
-
 	if(ifMultilevel){
-
+		cout << "Fitting objective and constraint functions with Multi-Level modeĺ" << endl;
 		output.printMessage("Binding the surrogate model with the Multi-Level modeĺ...");
 		surrogateModelML.setinputFileNameHighFidelityData(fileNameInputRead);
 		surrogateModelML.setinputFileNameLowFidelityData(fileNameInputReadLowFi);
@@ -202,7 +200,7 @@ ObjectiveFunction::ObjectiveFunction(){
 	}
 
 	else if(ifGradientAvailable == false){
-
+		cout << "Fitting objective and constraint functions with Kriging model" << endl;
 		surrogateModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
 		output.printMessage("Binding the surrogate model with the Kriging modeĺ...");
 		surrogate = &surrogateModel;
@@ -210,7 +208,7 @@ ObjectiveFunction::ObjectiveFunction(){
 	}
 
 	else if (surrogatetype == "gradient_enhanced_kriging"){
-
+		cout << "Fitting objective and constraint functions with gradient enhanced kriging model" << endl;
 		gekModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
 		output.printMessage("Binding the surrogate model with the gradient enhanced Kriging modeĺ...");
 	    surrogate = &gekModel;
@@ -219,7 +217,7 @@ ObjectiveFunction::ObjectiveFunction(){
 	     }
 
 	else if (surrogatetype == "sliced_gradient_enhanced_kriging"){
-
+		cout << "Fitting objective and constraint functions with sliced gradient enhanced kriging model" << endl;
 		gekModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
 		output.printMessage("Binding the surrogate model with the sliced gradient enhanced Kriging modeĺ...");
 		surrogate = &sgekModel;
@@ -227,14 +225,19 @@ ObjectiveFunction::ObjectiveFunction(){
 
 		 }
 
-	else {
-
+	else if (surrogatetype == "agrregation_model"){
+		cout << "Fitting objective and constraint functions with Agrregation model" << endl;
 		surrogateModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
 		surrogateModel.setNameOfInputFile(fileNameTrainingDataForSurrogate);
 		output.printMessage("Binding the surrogate model with the Agrregation modeĺ...");
 		surrogate = &surrogateModelGradient;
 
 	   }
+
+	else {
+			cout << "Error ! Surrogate model type has not been set !" << endl;
+
+		   }
 }
 
 

@@ -535,7 +535,8 @@ void RoDeODriver::parseConstraintDefinition(std::string inputString){
 	std::string exePath;
 	std::string marker;
 	std::string markerGradient;
-	std::string ifGradient;
+	// std::string ifGradient;
+    std::string gradient;
 	std::string surrogatetype;  // Modified by Kai
 
 	configKeysConstraintFunction.parseString(inputString);
@@ -553,7 +554,8 @@ void RoDeODriver::parseConstraintDefinition(std::string inputString){
 	exePath = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("PATH",0);
 	marker = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("MARKER",0);
 	markerGradient = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("MARKER_FOR_GRADIENT",0);
-	ifGradient = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("GRADIENT",0);
+	//ifGradient = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("GRADIENT",0);
+	gradient = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("GRADIENT",0);
 	surrogatetype = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("SURROGATE_CON",0); // Modified by Kai
 
 	ConstraintDefinition result(definitionBuffer);
@@ -568,12 +570,14 @@ void RoDeODriver::parseConstraintDefinition(std::string inputString){
 	result.ID = numberOfConstraints;
 	numberOfConstraints++;
 
+    // cout << "surrogate model type is" << result.surrogatetype << endl;
 
-	if(checkIfOn(ifGradient)){
+	if(checkIfOn(gradient)){
 
 		result.ifGradient = true;
 
 	}
+	//cout << "surrogate model type is" <<result.ifGradient << endl;
 
 	if(ifDisplayIsOn()){
 
@@ -636,10 +640,7 @@ void RoDeODriver::parseObjectiveFunctionDefinition(std::string inputString){
 	std::string surrogatetype;
 	std::string multilevel;
 
-    //cout << "eee" << endl;
 	configKeysObjectiveFunction.parseString(inputString);
-	//cout << "eee1" << endl;
-
 
 #if 0
 	printKeywordsObjective();
@@ -827,7 +828,6 @@ void RoDeODriver::extractConstraintDefinitionsFromString(std::string inputString
 			stringBufferConstraintFunction.assign(inputString,foundLeftBracket+1,foundRightBracket - foundLeftBracket -1);
 
 
-
 			displayMessage("Constraint function definition is found:");
 			displayMessage("\nDefinition begin");
 			displayMessage(stringBufferConstraintFunction);
@@ -892,6 +892,8 @@ void RoDeODriver::extractConfigDefinitionsFromString(std::string inputString){
 
 ConstraintFunction RoDeODriver::setConstraint(ConstraintDefinition constraintDefinition) const{
 
+	// constraintDefinition.print();
+
 	assert(constraintDefinition.ID >= 0);
 
 	if(ifDisplayIsOn()){
@@ -909,21 +911,25 @@ ConstraintFunction RoDeODriver::setConstraint(ConstraintDefinition constraintDef
 
 	vec lb = configKeys.getConfigKeyVectorDoubleValue("LOWER_BOUNDS");
 	vec ub = configKeys.getConfigKeyVectorDoubleValue("UPPER_BOUNDS");
+
 	constraintFunc.setParameterBounds(lb,ub);
 
+	std::string surrogatetype = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("SURROGATE_CON",0);
 
-	if(constraintDefinition.ifGradient){
+	constraintFunc.setSurrogateType(surrogatetype);
 
-		constraintFunc.setGradientOn();
+	std::string ifGradientAvailable = configKeysConstraintFunction.getConfigKeyStringVectorValueAtIndex("GRADIENT",0);
 
-	}
+	// cout << "graident of constraint function ...................." << ifGradientAvailable << endl;
+
+    if(checkIfOn(ifGradientAvailable)){
+
+    	constraintFunc.setGradientOn();
+
+    }
 
 
 	unsigned int nIterForSurrogateTraining = 10000;
-
-
-
-
 
 
 	constraintFunc.setNumberOfTrainingIterationsForSurrogateModel(nIterForSurrogateTraining);
@@ -1126,10 +1132,14 @@ Optimizer RoDeODriver::setOptimizationStudy(void) {
 	ObjectiveFunction objFunc = setObjectiveFunction();
 	optimizationStudy.addObjectFunction(objFunc);
 
+	//cout << " surrogate type is ......." << objFunc.getsurrogatetype() << endl;
 
 	for ( auto i = constraints.begin(); i != constraints.end(); i++ ) {
 
 		ConstraintFunction constraintToAdd = setConstraint(*i);
+
+	//	cout << " surrogate type is ......." << constraintToAdd.getsurrogatetype() << endl;
+
 		optimizationStudy.addConstraint(constraintToAdd);
 
 	}

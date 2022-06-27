@@ -231,22 +231,19 @@ void GEKModel::train(void){
 
 	clock_t start, finish;
 
-	start = clock();
+	//start = clock();
 
 	boxmin(hyper_l,hyper_u,num);    // Hooke Jeeves algorithm for hyper-parameter optimization
 
-	finish = clock();
+	//finish = clock();
 
-	cout << "GEK model training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
+	//cout << "GEK model training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
 
-	GEK_weights = getTheta();
+	GEK_weights = getOptimalTheta();
 
-	likelihood  = getLikelihood();
+	likelihood_optimal  = getOptimalLikelihood();
 
-//	cout <<  "The optimal hyper-parameter is " << GEK_weights << endl;
-//	cout <<  "The corresponding likelihood value is " << likelihood << endl;
-
-#if 1
+#if 0
 	printVector(GEK_weights,"GEK_weights");
 #endif
 
@@ -258,7 +255,8 @@ double GEKModel::likelihood_function(vec theta){
 
 	unsigned int dim = data.getDimension();
 	unsigned int N = data.getNumberOfSamples();
-	unsigned int mn = N*(dim+1);
+	int mn = N*(dim+1);
+
 	mat X = data.getInputMatrix();
 
 	correlationMatrixDot = correlationfunction.corrbiquadspline_gekriging(X,theta);
@@ -266,6 +264,8 @@ double GEKModel::likelihood_function(vec theta){
 	upperDiagonalMatrixDot = chol(correlationMatrixDot);
 
 	long double logdetR = 2*sum(log(diagvec(upperDiagonalMatrixDot)));
+
+	// cout << "determinant is " << logdetR << endl;
 
 	vec R_inv_ys(mn); R_inv_ys.fill(0.0);
 
@@ -275,7 +275,14 @@ double GEKModel::likelihood_function(vec theta){
 
 	solveLinearSystemCholesky(upperDiagonalMatrixDot, R_inv_F, vectorOfF);      /* solve R x = F */
 
-	beta0 = (1.0/dot(vectorOfF,R_inv_F)) * (dot(vectorOfF,R_inv_ys));
+	 beta0 = (1.0/dot(vectorOfF,R_inv_F)) * (dot(vectorOfF,R_inv_ys));
+
+
+	//beta0 = vectorOfF.t() % solve(upperDiagonalMatrixDot,solve(upperDiagonalMatrixDot.t(),yGEK));
+
+	 //cout << "output is " << yGEK << endl;
+
+	 //cout << "beta0 is " << solve(upperDiagonalMatrixDot,solve(upperDiagonalMatrixDot.t(),yGEK)) << endl;
 
 	vec ys_min_betaF = yGEK - beta0*vectorOfF;
 
@@ -285,7 +292,11 @@ double GEKModel::likelihood_function(vec theta){
 
 	sigmaSquared = (1.0 / (mn)) * dot(ys_min_betaF, R_inv_ys_min_beta);
 
+	// cout << "sigmaSquared is " << sigmaSquared << endl;
+
     likelihood = mn * log(sigmaSquared) + logdetR;
+
+    // cout << "likelihood is " << likelihood << endl;
 
     return likelihood;
 
@@ -879,6 +890,8 @@ void GEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 	vec log_lb = log10(hyper_l);
     vec random;  random.randu(num);
 
+    hyper_cur = hyper;
+    likelihood_cur = likeli_value;
 
 	for (unsigned int i=0;i<dim;i++){
 	  for (unsigned int j=0;j<num;j++){
@@ -891,9 +904,11 @@ void GEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 
 
 	//#pragma omp parallel for
-	for (unsigned int kk=0;kk<num;kk++){
+	for (unsigned int kk=0;kk<num;kk++){      // Multi-starts
 
-	  start(hyper.col(kk),hyper_lb,hyper_up);
+     // cout<< "Iteration number " << kk << endl;
+
+	  start(hyper.col(kk),hyper_lb,hyper_up,kk);
 
 	  int kmax;
 
@@ -902,28 +917,32 @@ void GEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
       else
 	      { kmax = std::min(dim,4);}
 
-	  for (unsigned int k = 0; k < kmax; k++){
+	  for (unsigned int k = 0; k < kmax; k++){  // Iterate for kmax times
 
-	   vec hyper1 = hyper_cur;
+	   vec hyper1 = hyper_cur.col(kk);
 
-	   explore(hyper_cur,likelihood_cur);
+	   explore(hyper_cur.col(kk),likelihood_cur(kk),kk);
 
-	   move(hyper1,hyper_cur,likelihood_cur);
+	   move(hyper1,hyper_cur.col(kk),likelihood_cur(kk),kk);
+
 	 }
 
-	  hyper.col(kk) = getTheta();
-	  likeli_value(kk) = getLikelihood();
+	  // cout<< "Current theta is " << getTheta() << endl;
+	  //cout<< "Current likelihood is " << getLikelihood() << endl;
+
 	}
 
+	likeli_value = getLikelihood();
+	hyper = getTheta();
 
 	uword i = likeli_value.index_min();
 
-	likelihood_cur = likeli_value(i);
-	hyper_cur = hyper.col(i);
+	likelihood_optimal = likeli_value(i);
+	hyper_optimal = hyper.col(i);
 
 }
 
-void GEKModel::start(vec hyper_in, vec hyper_l, vec hyper_u){
+void GEKModel::start(vec hyper_in, vec hyper_l, vec hyper_u, int kk){
 
 	  vec m = linspace(1,dim,dim)/(dim+2);
 	  increment = zeros(dim);
@@ -934,66 +953,67 @@ void GEKModel::start(vec hyper_in, vec hyper_l, vec hyper_u){
 
 	  ind_increment = find(increment != 1);
 
-	  hyper_cur = hyper_in;
+	  hyper_cur.col(kk) = hyper_in;
 
-	  likelihood_cur = likelihood_function(hyper_cur);
+	  likelihood_cur(kk) = likelihood_function(hyper_cur.col(kk));  //
 
 	  numberOfIteration = 0;
       hyperoptimizationHistory = zeros(dim+2,200*dim);
 
-	  hyperoptimizationHistory.col(numberOfIteration) = join_cols(hyper_cur, vec { likelihood_cur, 1.0} );
+	  hyperoptimizationHistory.col(numberOfIteration) = join_cols(hyper_cur.col(kk), vec { likelihood_cur(kk), 1.0} );
+
 
 }
 
-void GEKModel::explore(vec hyper_1, double likelihood_1){
+void GEKModel::explore(vec hyper_1, double likelihood_1, int kk){
 
 	unsigned int j; double DD;  unsigned int atbd;
 
-    hyper_cur = hyper_1; likelihood_cur = likelihood_1;
+    hyper_cur.col(kk) = hyper_1; likelihood_cur(kk) = likelihood_1;
 
 	for (unsigned int k = 0; k < size(ind_increment,0); k++){
 
 	   j = ind_increment(k);
-	   hyper_par = hyper_cur;
+	   hyper_par = hyper_cur.col(kk);
        DD = increment(j);
 
-       if (hyper_cur(j) == hyper_up(j)){
+       if (hyper_cur(j,kk) == hyper_up(j)){
 
     	   atbd = 1;
-    	   hyper_par(j) =  hyper_cur(j)/sqrt(DD); }
+    	   hyper_par(j) =  hyper_cur(j,kk)/sqrt(DD); }
 
-       else if (hyper_cur(j) == hyper_lb(j)){
+       else if (hyper_cur(j,kk) == hyper_lb(j)){
 
     	   atbd = 1;
-    	   hyper_par(j) =  hyper_cur(j)*sqrt(DD); }
+    	   hyper_par(j) =  hyper_cur(j,kk)*sqrt(DD); }
 
        else  {
 
     	   atbd = 0;
-    	   hyper_par(j) = std::min(hyper_up(j),hyper_cur(j)*DD);
+    	   hyper_par(j) = std::min(hyper_up(j),hyper_cur(j,kk)*DD);
        }
 
        likelihood = likelihood_function(hyper_par);
        numberOfIteration++;
        hyperoptimizationHistory.col(numberOfIteration)= join_cols(hyper_par, vec { likelihood, 2});
 
-       if (likelihood < likelihood_cur){
-            likelihood_cur = likelihood;
-            hyper_cur = hyper_par;  }
+       if (likelihood < likelihood_cur(kk)){
+            likelihood_cur(kk) = likelihood;
+            hyper_cur.col(kk) = hyper_par;  }
        else  {
 
     	    hyperoptimizationHistory(dim+1,numberOfIteration)= -2;
 
     	   if (!atbd) {
-    		    hyper_par(j) = std::max(hyper_lb(j),hyper_cur(j)/DD);
+    		    hyper_par(j) = std::max(hyper_lb(j),hyper_cur(j,kk)/DD);
     	        likelihood = likelihood_function(hyper_par);
 
     	        numberOfIteration++;
     	        hyperoptimizationHistory.col(numberOfIteration)=join_cols(hyper_par, vec { likelihood, 2});
 
-    	        if (likelihood < likelihood_cur){
-    	        	likelihood_cur = likelihood;
-    	        	hyper_cur = hyper_par;  }
+    	        if (likelihood < likelihood_cur(kk)){
+    	        	likelihood_cur(kk) = likelihood;
+    	        	hyper_cur.col(kk) = hyper_par;  }
     	        else
     	            hyperoptimizationHistory(dim+1,numberOfIteration)= -2;
     	    }
@@ -1002,12 +1022,10 @@ void GEKModel::explore(vec hyper_1, double likelihood_1){
 
 }
 
-void GEKModel::move(vec hyper_old,vec hyper_new, double likelihood_new){
+void GEKModel::move(vec hyper_old,vec hyper_new, double likelihood_new, int kk){
 
 	   vec v  = hyper_new/hyper_old;
 	   vec v1 = v-ones(dim,1);
-
-      // cout << "move step" << endl;
 
        if (v1.is_zero()){
 
@@ -1018,13 +1036,13 @@ void GEKModel::move(vec hyper_old,vec hyper_new, double likelihood_new){
     	  	    increment(k) = pow(increment(ind(k)),0.2);
     	    }
 
-    	   likelihood_cur = likelihood_new;
-    	   hyper_cur = hyper_new;
+    	   likelihood_cur(kk) = likelihood_new;
+    	   hyper_cur.col(kk) = hyper_new;
 
             return ;
         }
 
-        unsigned int rept = 1;   likelihood_cur = likelihood_new;  hyper_cur = hyper_new;
+        unsigned int rept = 1;   likelihood_cur(kk) = likelihood_new;  hyper_cur.col(kk) = hyper_new;
 
         while (rept){
 
@@ -1033,11 +1051,9 @@ void GEKModel::move(vec hyper_old,vec hyper_new, double likelihood_new){
 		   numberOfIteration++;
 		   hyperoptimizationHistory.col(numberOfIteration)= join_cols(hyper_par, vec { likelihood, 3});
 
-		   if (likelihood < likelihood_cur){
-
-			  // cout << "continous move" << endl;
-			   hyper_cur = hyper_par;
-			   likelihood_cur = likelihood;
+		   if (likelihood < likelihood_cur(kk)){
+			   hyper_cur.col(kk) = hyper_par;
+			   likelihood_cur(kk) = likelihood;
 			   v = v % v;
 		   }
 
@@ -1055,20 +1071,25 @@ void GEKModel::move(vec hyper_old,vec hyper_new, double likelihood_new){
          ind(dim-1) = 0;
 
          for (unsigned int k = 0; k < dim; k++){
-          	      increment(k) = pow(increment(ind(k)),0.25);
+          	 increment(k) = pow(increment(ind(k)),0.25);
           }
 }
 
-vec GEKModel::getTheta(void) const{
-
+mat GEKModel::getTheta(void) const{
 	return hyper_cur;
-
-
 }
 
-double GEKModel::getLikelihood(void) const{
+vec GEKModel::getOptimalTheta(void) const{
+	return hyper_optimal;
+}
 
+
+vec GEKModel::getLikelihood(void) const{
 	return likelihood_cur;
-
-
 }
+
+double GEKModel::getOptimalLikelihood(void) const{
+	return likelihood_optimal;
+}
+
+

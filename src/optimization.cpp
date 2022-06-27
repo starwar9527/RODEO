@@ -777,14 +777,18 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 #pragma omp parallel for
 	for(unsigned int iterEI = 0; iterEI <iterMaxEILoop; iterEI++ ){
 
+		//cout << " k " << iterEI << endl;
 
 		CDesignExpectedImprovement designToBeTried(dimension,numberOfConstraints);
 
+		//
 		designToBeTried.generateRandomDesignVector(lowerBoundsForEIMaximization, upperBoundsForEIMaximization);
 
 		objFun.calculateExpectedImprovement(designToBeTried);
 
 		addPenaltyToExpectedImprovementForConstraints(designToBeTried);
+
+		// cout << " Expected improvement value is " << designToBeTried.valueExpectedImprovement<< endl;
 
 #if 0
 		designToBeTried.print();
@@ -805,6 +809,7 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 	for(unsigned int iterEI = 0; iterEI <iterMaxEILoop; iterEI++ ){
 
 
+
 		CDesignExpectedImprovement designToBeTried(dimension,numberOfConstraints);
 
 		designToBeTried.generateRandomDesignVectorAroundASample(designWithMaxEI.dv, lowerBoundsForEIMaximization, upperBoundsForEIMaximization);
@@ -812,6 +817,8 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 		objFun.calculateExpectedImprovement(designToBeTried);
 
 		addPenaltyToExpectedImprovementForConstraints(designToBeTried);
+
+		// cout << " Expected improvement value is " << designToBeTried.valueExpectedImprovement<< endl;
 
 #if 0
 		designToBeTried.print();
@@ -1080,23 +1087,32 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 		}
 
+
 		start = clock();
 		   findTheMostPromisingDesign();    // find the optimal next point with maximal EI
         finish = clock();
 
+
 		cout << "The time for finding most promosing design point is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
 
 		//start = clock();
-		 CDesignExpectedImprovement optimizedDesignGradientBased = MaximizeEIGradientBased(theMostPromisingDesigns.at(0));
+
+
+		 CDesignExpectedImprovement optimizedDesignGradientBased = MaximizeEIGradientBased(theMostPromisingDesigns.at(0));  // Need further revision
+
+		// CDesignExpectedImprovement optimizedDesignGradientBased = theMostPromisingDesigns.at(0);
+
 		//finish = clock();
+
 		//cout << "time is " << (double)(finish-start)/CLOCKS_PER_SEC   <<endl;
 
 #if 0
 		optimizedDesignGradientBased.print();
 #endif
 
-
 		rowvec best_dvNorm = optimizedDesignGradientBased.dv;
+
+		// cout << "Optimal point is " << best_dvNorm << endl;
 
 		rowvec best_dv =normalizeRowVectorBack(best_dvNorm, lowerBounds, upperBounds);
 
@@ -1143,11 +1159,15 @@ void Optimizer::EfficientGlobalOptimization(void){
 		currentBestDesign.print();
 #endif
 
+
 		addConstraintValuesToData(currentBestDesign);
+
 		updateOptimizationHistory(currentBestDesign);
 
 		findTheGlobalOptimalDesign();
+
 		globalOptimalDesign.saveToAFile(globalOptimumDesignFileName);
+
 
 		if(ifDisplay){
 
@@ -1319,6 +1339,7 @@ void Optimizer::performDoE(unsigned int howManySamples, DoE_METHOD methodID){
 
 		rowvec dv = sampleCoordinates.row(sampleID);
 		Design currentDesign(dv);
+
 		currentDesign.setNumberOfConstraints(numberOfConstraints);
 		currentDesign.saveDesignVector(designVectorFileName);
 

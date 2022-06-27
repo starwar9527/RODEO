@@ -242,7 +242,7 @@ void SGEKModel::train(void){
 
 	finish = clock();
 
-    cout << "SGEK model training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
+   // cout << "SGEK model training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
 
 	GEK_weights = getTheta();
 
@@ -251,9 +251,9 @@ void SGEKModel::train(void){
  //	cout <<  "The optimal hyper-parameter is " << GEK_weights << endl;
  //	cout <<  "The optimal likelihood is " << likelihood << endl;
 
-#if 1
-	printVector(GEK_weights,"GEK_weights");
-#endif
+ //	#if 1
+ //		printVector(GEK_weights,"GEK_weights");
+ //	#endif
 
 	updateAuxilliaryFields();
 
@@ -265,6 +265,11 @@ void SGEKModel::slicing(unsigned int snum ){  // Divide the training data into m
 	dim = data.getDimension();
 	unsigned int N = data.getNumberOfSamples();
 	unsigned int mn = N*(dim+1);
+
+	if (N<snum){
+			std::cout<<" Training Sample size should be larger than the slice number ! \n";
+		    abort();
+		}
 
 	mat X = data.getInputMatrix();
 
@@ -1104,8 +1109,9 @@ void SGEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 
 
 	//#pragma omp parallel for
-	
 	for (unsigned int kk=0;kk<num;kk++){
+
+     // cout << " what " << kk << endl;
 
 	  start(hyper.col(kk),hyper_lb,hyper_up);
 
@@ -1128,9 +1134,13 @@ void SGEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 	  hyper.col(kk) = getAlpha();
 	  likeli_value(kk) = getLikelihood();
 
+      //cout << "current likelihood is " << likeli_value(kk)<< endl;
+      //cout << "current parameter is " << hyper.col(kk) << endl;
 	}
 
 	uword i = likeli_value.index_min();
+
+	// cout << "current likelihood is " << likeli_value << endl;
 
 	likelihood_cur = likeli_value(i);
 	hyper_cur = hyper.col(i);

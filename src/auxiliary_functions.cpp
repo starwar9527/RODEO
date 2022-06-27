@@ -71,6 +71,9 @@ void compileWithCpp(std::string fileName, std::string exeName){
 void changeDirectoryToRodeoHome(void){
 
 	const char* env_p;
+
+	env_p = std::getenv("RODEO_HOME");
+
 	if(env_p = std::getenv("RODEO_HOME")){
 		std::cout << "RODEO_HOME: " << env_p << '\n';
 	}
