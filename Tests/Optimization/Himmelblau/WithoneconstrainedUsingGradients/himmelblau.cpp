@@ -15,9 +15,10 @@ double HimmelblauAdj(double *x, double *xb) {
 }
 
 double constraint(double *x, double *xb1){
-		return x[0]+x[1];
+
 		xb1[0] = 1;
 		xb1[1] = 1;
+		return x[0]+x[1];
 }
 
 
@@ -39,7 +40,7 @@ FILE *outp = fopen("objFunVal.dat","w");
 fprintf(outp,"himmelblau_function = %15.10f\n",result);
 fprintf(outp,"himmelblau_gradient = %15.10f, %15.10f\n",xb[0],xb[1]);
 fprintf(outp,"constraint_function = %15.10f\n",constraintValue);
-fprintf(outp,"constraint_gradient = %15.10f\n",xb1[0],xb1[1]);
+fprintf(outp,"constraint_gradient = %15.10f, %15.10f\n",xb1[0],xb1[1]);
 fclose(outp);
 
 return 0;
