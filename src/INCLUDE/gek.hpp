@@ -77,13 +77,15 @@ private:
 	vec computeCorrelationVectorDot(rowvec x) const;
 
 	/* Added by Kai */
+
     int num;
 	vec hyper_lb;
 	vec hyper_up;
 	vec hyper_in;
 
-    vec hyper_cur;
+    mat hyper_cur;
 	vec hyper_par;
+	vec hyper_optimal;
 
 	vec increment;
 	uvec ind_increment;
@@ -93,7 +95,8 @@ private:
 	unsigned int numberOfIteration;
 	int dim;
 
-	double likelihood_cur;
+	vec likelihood_cur;
+	double likelihood_optimal;
 
 public:
 
@@ -141,11 +144,14 @@ public:
 	/* Hooke Jeeves algorithm */
 
 	void boxmin(vec hyper_lb, vec hyper_ub, int num);
-    void start(vec int_hyper, vec hyper_lb, vec hyper_ub);
-	void explore(vec int_hyper, double likelihood);
-    void move(vec hyper_1, vec hyper_2, double likelihood);
-    vec getTheta(void) const;
-    double getLikelihood(void) const;
+    void start(vec int_hyper, vec hyper_lb, vec hyper_ub, int num);
+	void explore(vec int_hyper, double likelihood, int num);
+    void move(vec hyper_1, vec hyper_2, double likelihood, int num);
+
+    mat getTheta(void) const;
+    vec getLikelihood(void) const;
+    vec getOptimalTheta(void) const;
+    double getOptimalLikelihood(void) const;
 
 	/* test functions */
 

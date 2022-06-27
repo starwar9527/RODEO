@@ -114,7 +114,6 @@ public:
 	void setInequalityConstraint(ConstraintDefinition inequalityConstraint);
 	void setParametersByDefinition(ConstraintDefinition inequalityConstraint);
 
-
 	bool checkIfRunExecutableNecessary(void);
 	void evaluate(Design &d);
 

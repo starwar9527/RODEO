@@ -169,7 +169,7 @@ public:
 	GEKModel      getGEKModel(void) const;  // Modified by Kai
 	SGEKModel     getSGEKModel(void) const; // Modified by Kai
 
-	SURROGATE_MODEL surrogateModelType;  // Modified by Kai
+	//SURROGATE_MODEL surrogateModelType;  // Modified by Kai
 
 	void setGradientOn(void);
 	void setGradientOff(void);
@@ -187,10 +187,19 @@ public:
 		return dim;
 	}
 
+	void setSurrogateType(std::string surrogate_type){
+		surrogatetype = surrogate_type;
+	}
+
 	std::string getName(void) const{
 
 		return name;
 	}
+
+	std::string getsurrogatetype(void) const{  // Created by Kai
+
+			return surrogatetype;
+		}
 
 	bool ifHasFunctionFunctionPointer(void) const{
 

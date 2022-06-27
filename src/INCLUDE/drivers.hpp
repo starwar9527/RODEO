@@ -74,6 +74,7 @@ private:
 
 
 public:
+
 	RoDeODriver();
 
 	void setDisplayOn(void);
