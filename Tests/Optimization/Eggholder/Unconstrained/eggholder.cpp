@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<math.h>
+#include <stack>
 
 double Eggholder(double *x){
 	return -(x[1]+47.0)*sin(sqrt(fabs(x[1]+0.5*x[0]+47.0)))-x[0]*sin(sqrt(fabs(x[0]-(x[1]+47.0) )));

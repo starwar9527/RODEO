@@ -1,6 +1,6 @@
 # current working directory
-WORKING_DIRECTORY=/home/kaicheng/Desktop/RoDeO-master/Tests/SurrogateModels/SGEK/NACA0012
+WORKING_DIRECTORY=/home/cheng/Desktop/RODEO-master/Tests/Optimization/Dropwave/UnconstrainedUsingGradients
 # directory for the python scripts
-PYTHON_DIRECTORY= /home/kaicheng/Desktop/RoDeO-master/python
+PYTHON_DIRECTORY=/home/cheng/Desktop/RODEO-master/python
 # name of the configuration file
-CONFIGURATION_FILE=NACA0012.cfg
+CONFIGURATION_FILE=Dropwave.cfg
