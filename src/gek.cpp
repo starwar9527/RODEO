@@ -111,6 +111,7 @@ void GEKModel::initializeSurrogateModel(void){
 	epsilonGEK = 0.0;
 
 	/* check if two sample are too close to each other */
+
 	for(unsigned int i=0; i<numberOfSamples; i++){
 
 		rowvec sample1 = data.getRowX(i);
@@ -210,12 +211,13 @@ void GEKModel::printHyperParameters(void) const{
 void GEKModel::saveHyperParameters(void) const{
 
 
-
 }
+
 void GEKModel::loadHyperParameters(void){
 
 
 }
+
 void GEKModel::train(void){
 
 	if(!ifInitialized){
@@ -231,13 +233,13 @@ void GEKModel::train(void){
 
 	clock_t start, finish;
 
-	//start = clock();
+	start = clock();
 
 	boxmin(hyper_l,hyper_u,num);    // Hooke Jeeves algorithm for hyper-parameter optimization
 
-	//finish = clock();
+	finish = clock();
 
-	//cout << "GEK model training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
+	cout << "GEK model training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
 
 	GEK_weights = getOptimalTheta();
 
@@ -265,8 +267,6 @@ double GEKModel::likelihood_function(vec theta){
 
 	long double logdetR = 2*sum(log(diagvec(upperDiagonalMatrixDot)));
 
-	// cout << "determinant is " << logdetR << endl;
-
 	vec R_inv_ys(mn); R_inv_ys.fill(0.0);
 
 	solveLinearSystemCholesky(upperDiagonalMatrixDot, R_inv_ys, yGEK);    /* solve R x = ys */
@@ -275,14 +275,7 @@ double GEKModel::likelihood_function(vec theta){
 
 	solveLinearSystemCholesky(upperDiagonalMatrixDot, R_inv_F, vectorOfF);      /* solve R x = F */
 
-	 beta0 = (1.0/dot(vectorOfF,R_inv_F)) * (dot(vectorOfF,R_inv_ys));
-
-
-	//beta0 = vectorOfF.t() % solve(upperDiagonalMatrixDot,solve(upperDiagonalMatrixDot.t(),yGEK));
-
-	 //cout << "output is " << yGEK << endl;
-
-	 //cout << "beta0 is " << solve(upperDiagonalMatrixDot,solve(upperDiagonalMatrixDot.t(),yGEK)) << endl;
+	beta0 = (1.0/dot(vectorOfF,R_inv_F)) * (dot(vectorOfF,R_inv_ys));
 
 	vec ys_min_betaF = yGEK - beta0*vectorOfF;
 
@@ -292,11 +285,8 @@ double GEKModel::likelihood_function(vec theta){
 
 	sigmaSquared = (1.0 / (mn)) * dot(ys_min_betaF, R_inv_ys_min_beta);
 
-	// cout << "sigmaSquared is " << sigmaSquared << endl;
 
     likelihood = mn * log(sigmaSquared) + logdetR;
-
-    // cout << "likelihood is " << likelihood << endl;
 
     return likelihood;
 
@@ -318,6 +308,14 @@ double GEKModel::likelihood_function(vec theta){
 	return fGEK;
 
 }
+
+ vec GEKModel::interpolate_vec(rowvec x ) const {
+
+	 cout << "ERROR: interpolate for vector output has not been utilized in GEK \n";
+	 abort();
+
+ }
+
 
 /* mat GEKModel::interpolate_all(mat xtest) {
 
@@ -356,6 +354,14 @@ void GEKModel::interpolateWithVariance(rowvec xp,double *ftildeOutput,double *sS
 	solveLinearSystemCholesky(upperDiagonalMatrixDot, R_inv_r, r);
 
 	*sSqrOutput = sigmaSquared*( 1.0 - dot(r,R_inv_r)+ ( pow( (dot(r,R_inv_F) -1.0 ),2.0)) / (dot(vectorOfF,R_inv_F) ) );
+
+}
+
+
+void GEKModel::interpolateWithVariance_vec(rowvec xp,vec &f_tilde, vec &ssqr) const{
+
+	cout << "ERROR: interpolateWithVariance for vector output has not been utilized in GEK \n";
+	abort();
 
 }
 
@@ -879,6 +885,46 @@ void GEKModel::calculateExpectedImprovement(CDesignExpectedImprovement &currentD
 
 }
 
+
+
+/*void GEKModel::calculateExpectedImprovement_Grad(CDesignExpectedImprovement &currentDesign) const{  // Created by Kai
+
+	double ftilde = 0.0;
+	double ssqr   = 0.0;
+
+	interpolateWithVariance(currentDesign.dv,&ftilde,&ssqr);
+
+	double	sigma = sqrt(ssqr);
+
+	double expectedImprovementValue = 0.0;
+
+	if(fabs(sigma) > EPSILON){
+
+		double ymin = data.getMinimumOutputVector();
+		double	Z = (ymin - ftilde)/sigma;
+
+	#if 0
+		printf("Z = %15.10f\n",Z);
+		printf("ymin = %15.10f\n",ymin);
+	#endif
+
+
+		expectedImprovementValue = (ymin - ftilde)*cdf(Z,0.0,1.0)+ sigma * pdf(Z,0.0,1.0);
+	}
+	else{
+
+		expectedImprovementValue = 0.0;
+
+		}
+	#if 0
+		printf("expectedImprovementValue = %20.20f\n",expectedImprovementValue);
+	#endif
+
+		currentDesign.objectiveFunctionValue = ftilde;
+		currentDesign.valueExpectedImprovement = expectedImprovementValue;
+
+} */
+
 void GEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 
 	dim = getDimension();
@@ -904,9 +950,8 @@ void GEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 
 
 	//#pragma omp parallel for
-	for (unsigned int kk=0;kk<num;kk++){      // Multi-starts
 
-     // cout<< "Iteration number " << kk << endl;
+	for (unsigned int kk=0;kk<num;kk++){      // Multi-starts
 
 	  start(hyper.col(kk),hyper_lb,hyper_up,kk);
 
@@ -926,9 +971,6 @@ void GEKModel::boxmin(vec hyper_l, vec hyper_u, int num){
 	   move(hyper1,hyper_cur.col(kk),likelihood_cur(kk),kk);
 
 	 }
-
-	  // cout<< "Current theta is " << getTheta() << endl;
-	  //cout<< "Current likelihood is " << getLikelihood() << endl;
 
 	}
 

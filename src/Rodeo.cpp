@@ -24,13 +24,11 @@
  * General Public License along with CoDiPack.
  * If not, see <http://www.gnu.org/licenses/>.
  *
- * Authors: Emre Özkaya, (SciComp, TU Kaiserslautern)
+ * Authors: Emre Özkaya, (SciComp, TU Kaiserslautern), Kai Cheng (SDU)
  *
  *
  *
  */
-
-
 
 #include<stdio.h>
 #include<iostream>
@@ -103,13 +101,11 @@ int main(int argc, char* argv[]){
 
 	changeDirectoryToWork(settings.cwd);
 
-
 	RoDeODriver driverToRun;
+
 	driverToRun.readConfigFile();
 
 	driverToRun.runDriver();
-
-
 
 
 }

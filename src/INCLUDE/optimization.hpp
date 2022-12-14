@@ -58,8 +58,8 @@ private:
 
 	mat optimizationHistory;
 
-
 	std::vector<ConstraintFunction> constraintFunctions;
+
 	ObjectiveFunction objFun;
 
 	std::vector<CDesignExpectedImprovement> theMostPromisingDesigns;
@@ -77,8 +77,6 @@ private:
 	double zoomInFactor = 0.5;
 
 	unsigned int iterMaxEILoop;
-
-
 
 
 public:
@@ -99,7 +97,6 @@ public:
 
 	bool ifVisualize = false;
 	bool ifDisplay = false;
-
 	bool ifBoxConstraintsSet = false;
 
 

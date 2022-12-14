@@ -188,7 +188,7 @@ mat Correlationfunction::corrbiquadspline_gekriging(mat &X, vec theta){
      return correlationMatrix;
  }
 
-void Correlationfunction::corrbiquadspline_gekriging_vec(mat &xtest, mat &X, vec theta){
+mat Correlationfunction::corrbiquadspline_gekriging_vec(mat &xtest, mat &X, vec theta){
 
 	unsigned int dim = size(X,1);
 	unsigned int m   = size(X,0);
@@ -260,11 +260,11 @@ void Correlationfunction::corrbiquadspline_gekriging_vec(mat &xtest, mat &X, vec
 		correlationVec.submat(0,(i+1)*m,m1-1,(i+2)*m-1) = r_g1.t();
 	}
 
-
+	return correlationVec;
  }
 
 
-void Correlationfunction::corrgaussian_gekriging(mat &X, vec theta){
+mat Correlationfunction::corrgaussian_gekriging(mat &X, vec theta){
 
 
 	unsigned int dim = size(X,1);
@@ -338,11 +338,11 @@ void Correlationfunction::corrgaussian_gekriging(mat &X, vec theta){
     }
 
 	 correlationMatrix = correlationMatrix + correlationMatrix.t()-diagmat(correlationMatrix);
-
+	 return correlationMatrix;
  }
 
 
-void Correlationfunction::corrgaussian_gekriging_vec(mat &xtest,mat &X, vec theta){
+mat Correlationfunction::corrgaussian_gekriging_vec(mat &xtest,mat &X, vec theta){
 
 
 	unsigned int dim = size(X,1);
@@ -375,9 +375,11 @@ void Correlationfunction::corrgaussian_gekriging_vec(mat &xtest,mat &X, vec thet
     	 dist = reshape(d.submat(0,i,mzmax-1,i),m,m1);
 	     correlationVec.submat(0,(i+1)*m,m1-1,(i+2)*m-1) = 2*theta(i)*dist.t() % r_g;
     }
+
+    return correlationVec;
  }
 
-void Correlationfunction::corrgaussian_kriging(mat &X, vec theta){
+mat Correlationfunction::corrgaussian_kriging(mat &X, vec theta){
 
 	unsigned int dim = size(X,1);
 	unsigned int m   = size(X,0);
@@ -421,10 +423,10 @@ void Correlationfunction::corrgaussian_kriging(mat &X, vec theta){
 	sp_mat R(conv_to<umat>::from(location.t()),correlation.t());
 
 	correlationMatrix = R + R.t()-diagmat(R);
-
+	 return correlationMatrix;
  }
 
-void Correlationfunction::corrgaussian_kriging_vec(mat &xtest, mat &X, vec theta){
+mat Correlationfunction::corrgaussian_kriging_vec(mat &xtest, mat &X, vec theta){
 
 	unsigned int dim = size(X,1);
 	unsigned int m   = size(X,0);
@@ -447,10 +449,10 @@ void Correlationfunction::corrgaussian_kriging_vec(mat &xtest, mat &X, vec theta
 	vec r = exp(sum(td,1));
 	mat r_g = reshape(r,m,m1);
 	correlationVec.submat(0,0,m1-1,m-1) = r_g.t();
-
+	return correlationVec;
  }
 
-void Correlationfunction::corrbiquadspline_kriging(mat &X,vec theta){
+mat Correlationfunction::corrbiquadspline_kriging(mat &X,vec theta){
 
 
 	unsigned int dim = size(X,1);
@@ -505,10 +507,10 @@ void Correlationfunction::corrbiquadspline_kriging(mat &X,vec theta){
 	sp_mat R(conv_to<umat>::from(location.t()),correlation.t());
 
 	correlationMatrix = R + R.t()-diagmat(R);
-
+	return correlationMatrix;
  }
 
-void Correlationfunction::corrbiquadspline_kriging_vec(mat &xtest, mat &X,vec theta){
+mat Correlationfunction::corrbiquadspline_kriging_vec(mat &xtest, mat &X,vec theta){
 
 	unsigned int dim = size(X,1);
 	unsigned int m   = size(X,0);
@@ -546,5 +548,5 @@ void Correlationfunction::corrbiquadspline_kriging_vec(mat &xtest, mat &X,vec th
     mat r_g = reshape(r,m,m1);
 
     correlationVec.submat(0,0,m1-1,m-1) = r_g.t();
-
+    return correlationVec;
  }

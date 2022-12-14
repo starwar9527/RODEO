@@ -1,6 +1,6 @@
 # current working directory
-WORKING_DIRECTORY=/home/cheng/Desktop/RODEO-master/Tests/Optimization/Dropwave/UnconstrainedUsingGradients
+WORKING_DIRECTORY=/home/cheng/Desktop/RODEO-master/Tests/Optimization/Rosenbrock/Withfieldconstraint
 # directory for the python scripts
 PYTHON_DIRECTORY=/home/cheng/Desktop/RODEO-master/python
 # name of the configuration file
-CONFIGURATION_FILE=Dropwave.cfg
+CONFIGURATION_FILE=Rosenbrock.cfg

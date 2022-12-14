@@ -193,7 +193,7 @@ void SGEKModel::initializeSurrogateModel(void){
 
 	std::cout << "SGEK model initialization is done...\n";
 
-	snum = 10;
+	snum = 5;
     slicing(snum);
 
 }
@@ -242,18 +242,13 @@ void SGEKModel::train(void){
 
 	finish = clock();
 
-   // cout << "SGEK model training time is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
-
 	GEK_weights = getTheta();
 
 	likelihood  = getLikelihood();
 
- //	cout <<  "The optimal hyper-parameter is " << GEK_weights << endl;
- //	cout <<  "The optimal likelihood is " << likelihood << endl;
-
- //	#if 1
- //		printVector(GEK_weights,"GEK_weights");
- //	#endif
+    #if 0
+  		printVector(GEK_weights,"GEK_weights");
+    #endif
 
 	updateAuxilliaryFields();
 
@@ -349,7 +344,7 @@ void SGEKModel::original_likelihood_function(vec alpha){ //  Original likelihood
 }
 
 
-double SGEKModel::sliced_likelihood_function(vec alpha){ //  Sliced likelihood function
+double SGEKModel::likelihood_function(vec alpha){ //  Sliced likelihood function
 
 	vec theta = alpha(0)*pow(sensitivity,alpha(1))+alpha(2);
 
@@ -435,9 +430,9 @@ double SGEKModel::sliced_likelihood_function(vec alpha){ //  Sliced likelihood f
 
 			X_1(k) = X.rows(index(k+1));
 
-			if (size(X_1(k),0)==1){
+			if (size(X_1(k),0)<2){
 
-				std::cout<<"ERROR: Samples size within slice must greater than 1\n";
+				std::cout<<"ERROR: Samples size within each slice should be greater than 1\n";
 
 			}
 
@@ -518,6 +513,14 @@ double SGEKModel::sliced_likelihood_function(vec alpha){ //  Sliced likelihood f
 
 }
 
+vec SGEKModel::interpolate_vec(rowvec x ) const {
+
+	cout << "ERROR: interpolateWithVariance for vector output has not been utilized in SGEK model \n";
+    abort();
+
+}
+
+
 /* mat SGEKModel::interpolate_all(mat xtest) {
 
 	mat X = data.getInputMatrix();
@@ -558,6 +561,12 @@ void SGEKModel::interpolateWithVariance(rowvec xp,double *ftildeOutput,double *s
 }
 
 
+void  SGEKModel::interpolateWithVariance_vec(rowvec xp,vec &f_tilde, vec &ssqr) const{
+
+	cout << "ERROR: interpolateWithVariance for vector output has not been utilized in SGEK model \n";
+	abort();
+
+}
 /*
  * derivative of R(x^i,x^j) w.r.t. x^i_k (for GEK)
  *
@@ -698,6 +707,7 @@ double SGEKModel::computedR_dxi_dxj(rowvec x_i, rowvec x_j, int l,int k) const{
 	if (k != l) {
 
 		/* dx = -4.0*theta(k)*theta(l)*(x_i(k)-x_j(k))*(x_i(l)-x_j(l))*R;*/
+
 		xi1  = fabs(x_i(k)-x_j(k))*theta(k);     /* Modified by Kai Cheng */
 		ui1  = sign(x_i(k)-x_j(k))*theta(k);
 		xi2  = fabs(x_i(l)-x_j(l))*theta(l);
@@ -1160,7 +1170,7 @@ void SGEKModel::start(vec hyper_in, vec hyper_l, vec hyper_u){
 
 	  hyper_cur = hyper_in;
 
-	  likelihood_cur = sliced_likelihood_function(hyper_cur);
+	  likelihood_cur = likelihood_function(hyper_cur);
 
 	  numberOfIteration = 0;
 
@@ -1199,7 +1209,7 @@ void SGEKModel::explore(vec hyper_1, double likelihood_1){
        }
 
 
-       likelihood = sliced_likelihood_function(hyper_par);
+       likelihood = likelihood_function(hyper_par);
 
        numberOfIteration++;
        hyperoptimizationHistory.col(numberOfIteration)= join_cols(hyper_par, vec { likelihood, 2});
@@ -1213,7 +1223,7 @@ void SGEKModel::explore(vec hyper_1, double likelihood_1){
 
     	   if (!atbd) {
     		    hyper_par(j) = std::max(hyper_lb(j),hyper_cur(j)/DD);
-    	        likelihood = sliced_likelihood_function(hyper_par);
+    	        likelihood = likelihood_function(hyper_par);
 
     	        numberOfIteration++;
     	        hyperoptimizationHistory.col(numberOfIteration)=join_cols(hyper_par, vec { likelihood, 2});
@@ -1255,7 +1265,7 @@ void SGEKModel::move(vec hyper_old,vec hyper_new, double likelihood_new){
         while (rept){
 
 		   hyper_par = min(join_rows(hyper_up,max(join_rows(hyper_lb,hyper_new % v),1)),1);
-		   likelihood = sliced_likelihood_function(hyper_par);
+		   likelihood = likelihood_function(hyper_par);
 		   numberOfIteration++;
 		   hyperoptimizationHistory.col(numberOfIteration)= join_cols(hyper_par, vec { likelihood, 3});
 
