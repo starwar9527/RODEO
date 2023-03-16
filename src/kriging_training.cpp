@@ -115,7 +115,7 @@ void KrigingModel::initializeSurrogateModel(void){
 	R_inv_I= zeros<vec>(numberOfSamples);
 	vectorOfOnes= ones<vec>(numberOfSamples);
 
-	if (ifVectorOutput){
+	if (ifVectorOutput){           // Check if the output is a vector
 
 		rank = readRank();
 
@@ -129,7 +129,7 @@ void KrigingModel::initializeSurrogateModel(void){
 
 	 }
 
-	if(ifUsesLinearRegression){   // current, we don't use linear regression
+	if(ifUsesLinearRegression){   // currently, we don't use linear regression
 
 		output.printMessage("Linear model is active for the Kriging model...");
 
@@ -179,10 +179,7 @@ void KrigingModel::saveHyperParameters(void) const{
 
 		saveBuffer.save(hyperparameters_filename,csv_ascii);
 
-
 	}
-
-
 
 }
 
@@ -250,8 +247,6 @@ void KrigingModel::setRegressionWeights(vec weights){
 	linearModel.setWeights(weights);
 
 }
-
-
 
 
 void KrigingModel::setEpsilon(double value){
@@ -398,7 +393,7 @@ void KrigingModel::updateAuxilliaryFields(void){
 
 		for (unsigned int i = 0; i< rank; i++){
 
-		   assignOutput(i);
+		   assignOutput(i);               // assign the i-th POD coefficient to the output
 
 		   vec ys = data.getOutputVector();
 
@@ -433,10 +428,6 @@ void KrigingModel::updateAuxilliaryFields(void){
 		   	vec ys_min_betaI = ys - beta0*vectorOfOnes;
 
 		   	/* solve R x = ys-beta0*I */
-
-			//std::cout<< "dimension is " <<  R_inv_ys_min_beta_vec[i].size() << endl;
-			//std::cout<< "dimension 1 is " <<  ys_min_betaI.size() << endl;
-			//std::cout<< "dimension 2 is " <<   upperDiagonalMatrix_vec[i].n_rows << endl;
 
 		   	solveLinearSystemCholesky(upperDiagonalMatrix_vec[i], R_inv_ys_min_beta_vec[i] , ys_min_betaI);
 

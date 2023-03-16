@@ -854,11 +854,11 @@ void ObjectiveFunction::interpolateWithVariance(rowvec x, double *mean, double *
 
 		    double constraint_value = value;
 
-		    mean_vec1 = mean_vec1 % stdvector + meanvector;          // original prediction mean
+		    mean_vec1 = mean_vec1 % stdvector + meanvector;            // original prediction mean
 
-		    variance_vec1 = variance_vec1 % stdvector % stdvector;   // original prediction variance
+		    variance_vec1 = variance_vec1 % stdvector % stdvector;     // original prediction variance
 
-		  //  cout << "mean is " << mean_vec1  << endl;
+		  // cout << "mean is " << mean_vec1  << endl;
 
 			if (inequalityType == "<") {
 

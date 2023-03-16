@@ -74,7 +74,7 @@ private:
     mat pod_basiscoefficient;
     vec singularvalue;
 
-    double threshold =  0.99999;
+    double threshold =  0.999;
     int rank;
 
 	mat XrawTest;

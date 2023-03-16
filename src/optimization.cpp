@@ -383,7 +383,7 @@ void Optimizer::estimateConstraints(CDesignExpectedImprovement &design) const{
 
 		if (variance != 0) {
 
-			 design.probability_con(constraintIt)  = 1 -cdf(-mean/sqrt(variance),0.0,1.0);  // Compute the probability that the constraint function is satisfied.
+			 design.probability_con(constraintIt)  = 1 - cdf(-mean/sqrt(variance),0.0,1.0);  // Compute the probability that the constraint function is satisfied.
 
 		} else if(mean> 0)  {
 
@@ -801,11 +801,12 @@ void Optimizer::findTheGlobalOptimalDesign(void){
 /* These designs (there can be more than one) are found by maximizing the expected
  *  Improvement function and taking the constraints into account
  */
+
 void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 
-	assert(ifSurrogatesAreInitialized);
+	 assert(ifSurrogatesAreInitialized);
 
-	theMostPromisingDesigns.clear();
+	 theMostPromisingDesigns.clear();
 
 	 CDesignExpectedImprovement designWithMaxEI(dimension,numberOfConstraints);
 
@@ -813,13 +814,13 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 
      initial_dv.zeros(dimension);
 
-     initial_dv = (lowerBounds.t()+upperBounds.t())/2;
+     initial_dv = (lowerBounds.t()+upperBounds.t())/2;   // initial value of design parameter
 
      designWithMaxEI.dv = initial_dv;
 
  #pragma omp parallel for
 
-	for(unsigned int iterEI = 0; iterEI <iterMaxEILoop; iterEI++ ){
+	for(unsigned int iterEI = 0; iterEI <iterMaxEILoop; iterEI++ ){   // global search
 
 		CDesignExpectedImprovement designToBeTried(dimension,numberOfConstraints);
 
@@ -847,7 +848,7 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 
 	#pragma omp parallel for
 
-	for(unsigned int iterEI = 0; iterEI <iterMaxEILoop; iterEI++ ){
+	for(unsigned int iterEI = 0; iterEI <iterMaxEILoop; iterEI++ ){             // local search
 
 		CDesignExpectedImprovement designToBeTried(dimension,numberOfConstraints);
 
@@ -1127,7 +1128,7 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 		// CDesignExpectedImprovement optimizedDesignGradientBased = MaximizeEIGradientBased(theMostPromisingDesigns.at(0));  // Need further revision
 
-	       CDesignExpectedImprovement optimizedDesignGradientBased = theMostPromisingDesigns.at(0);
+	      CDesignExpectedImprovement optimizedDesignGradientBased = theMostPromisingDesigns.at(0);
 
 
 #if 0
@@ -1168,7 +1169,7 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 		objFun.addDesignToData(currentBestDesign);
 
-		computeConstraintsandPenaltyTerm(currentBestDesign);
+		computeConstraintsandPenaltyTerm(currentBestDesign);  // Currently, we do not penalize the constraint.
 
 		calculateImprovementValue(currentBestDesign);
 
@@ -1198,13 +1199,12 @@ void Optimizer::EfficientGlobalOptimization(void){
 			currentBestDesign.print();
 			std::cout<<"\n\n";
 
-
 		}
-
 
 		simulationCount ++;
 
 		/* terminate optimization */
+
 		if(simulationCount >= maxNumberOfSamples){
 
 
@@ -1217,7 +1217,6 @@ void Optimizer::EfficientGlobalOptimization(void){
 				globalOptimalDesign.print();
 				std::cout<<"\n\n";
 
-
 			}
 
 			if(ifVisualize){
@@ -1225,18 +1224,12 @@ void Optimizer::EfficientGlobalOptimization(void){
 				visualizeOptimizationHistory();
 			}
 
-
-
 			break;
 		}
 
-
-
 	} /* end of the optimization loop */
-
-
-
 }
+
 void Optimizer::cleanDoEFiles(void) const{
 
 	std::string fileNameObjectiveFunction = objFun.getName()+".csv";

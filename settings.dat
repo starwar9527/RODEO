@@ -1,6 +1,6 @@
 # current working directory
-WORKING_DIRECTORY=/home/cheng/Desktop/RODEO-master/Tests/Optimization/Rosenbrock/Withfieldconstraint
+WORKING_DIRECTORY=/home/cheng/Desktop/RODEO/Tests/Optimization/Induheat
 # directory for the python scripts
-PYTHON_DIRECTORY=/home/cheng/Desktop/RODEO-master/python
+PYTHON_DIRECTORY=/home/cheng/Desktop/RODEO/python
 # name of the configuration file
-CONFIGURATION_FILE=Rosenbrock.cfg
+CONFIGURATION_FILE=Induheat.cfg

@@ -291,14 +291,21 @@ void SurrogateModelData::pod_ROM(void){
 
 	singularvalue = s;
 
+	rank = 1;
+
 	for (unsigned int i=0; i<numberOfSamples; i++){
 
 	   double ratio = sum(singularvalue.subvec(0,i))/sum(singularvalue);
 
+	   // cout << " The ratio  is " << ratio  << endl;
+
         if (ratio > threshold){
-	         rank = i+1;
-	         break;
-	    }
+        	break;
+        }
+        else {
+        	rank = i+1;
+        }
+
 	 }
 
 	pod_basis = U.cols(0,rank-1);
@@ -310,8 +317,6 @@ void SurrogateModelData::pod_ROM(void){
 	cout << " The proper orthogonal decomposition mode number is " << rank << endl;
 
 }
-
-
 
 
 void SurrogateModelData::assignGradientMatrix(void){

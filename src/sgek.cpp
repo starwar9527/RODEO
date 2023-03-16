@@ -231,7 +231,7 @@ void SGEKModel::train(void){
 
 	unsigned int dim = data.getDimension();
 
-	vec hyper_l = {0.0005*dim, 0.2, 0.0005*dim};   // lower bound
+	vec hyper_l = {0.001*dim, 0.2, 0.001*dim};   // lower bound
 	vec hyper_u = {2.5*dim, 1, 2.5*dim};           // upper bound
 
     num = 10;
