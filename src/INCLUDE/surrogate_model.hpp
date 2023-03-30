@@ -123,8 +123,8 @@ public:
 	int readRank(void) const;
 	double readOutputMean(void) const;
 	double readOutputStd(void) const;
-	vec readOutputMeanVector(void) const;
-	vec readOutputStdVector(void) const;
+	rowvec readOutputMeanVector(void) const;
+	rowvec readOutputStdVector(void) const;
 
 	mat getPodBasis(void) const;
 
@@ -195,7 +195,6 @@ public:
 
 	rowvec getRowX(unsigned int index) const;
 	rowvec getRowXRaw(unsigned int index) const;
-
 
 	void visualizeTestResults(void) const;
 

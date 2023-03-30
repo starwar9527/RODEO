@@ -425,7 +425,9 @@ void ConstraintFunction::setParametersByDefinition(ConstraintDefinition inequali
 
 	executableName = inequalityConstraint.executableName;
 	executablePath = inequalityConstraint.path;
-	jsonFile = inequalityConstraint.jsonFile;
+
+	jsonFile = inequalityConstraint.jsonFile;   // for induheat project
+
 	fileNameDesignVector = inequalityConstraint.designVectorFilename;
 	fileNameOutputValueRead = inequalityConstraint.outputValueFilename;
 	fileNameOutputGradRead = inequalityConstraint. outputGradFilename;

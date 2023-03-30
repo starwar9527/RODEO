@@ -840,8 +840,14 @@ void ObjectiveFunction::interpolateWithVariance(rowvec x, double *mean, double *
 		  surrogate->interpolateWithVariance_vec(x, mean_vec, variance_vec);
 
 		  mat basis = getPodBasis();
+		  rowvec meanvector = surrogate->readOutputMeanVector();
+		  rowvec stdvector  = surrogate->readOutputStdVector();
 
 		  for (unsigned int i = 0; i< rank; i++ ){       // recover the full state solution
+
+			  mean_vec(i) = mean_vec(i)*stdvector(i) + meanvector(i);
+
+			  variance_vec(i) = variance_vec(i)*stdvector(i)*stdvector(i);
 
 		      mean_vec1 = mean_vec1 + basis.col(i)*(mean_vec(i));
 
@@ -849,16 +855,8 @@ void ObjectiveFunction::interpolateWithVariance(rowvec x, double *mean, double *
 
 		  }
 
-		    vec meanvector = surrogate->readOutputMeanVector();
-		    vec stdvector  = surrogate->readOutputStdVector();
 
 		    double constraint_value = value;
-
-		    mean_vec1 = mean_vec1 % stdvector + meanvector;            // original prediction mean
-
-		    variance_vec1 = variance_vec1 % stdvector % stdvector;     // original prediction variance
-
-		  // cout << "mean is " << mean_vec1  << endl;
 
 			if (inequalityType == "<") {
 

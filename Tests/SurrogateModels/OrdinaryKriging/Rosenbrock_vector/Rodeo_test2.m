@@ -23,7 +23,7 @@ for i = 1 : n
   pd_const{1,i} = @(x)1;
 end
 
-lb = -5.*ones(1,n);  ub = 5.*ones(1,n); N = 100; N1 = 1000;
+lb = -5.*ones(1,n);  ub = 5.*ones(1,n); N = 50; N1 = 50;
 
 % pp = sobolset(n,'Skip',5); u=net(pp,N);  
 % pp1 = sobolset(n,'Skip',1001,'Leap',N1); u1=net(pp1,N1);  

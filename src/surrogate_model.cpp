@@ -226,13 +226,13 @@ double SurrogateModel::readOutputStd(void) const{
 
 }
 
-vec SurrogateModel::readOutputMeanVector(void) const{
+rowvec SurrogateModel::readOutputMeanVector(void) const{
 
 	return data.getOutputMeanVector();
 
 }
 
-vec SurrogateModel::readOutputStdVector(void) const{
+rowvec SurrogateModel::readOutputStdVector(void) const{
 
 	return data.getOutputStdVector();
 
@@ -272,8 +272,6 @@ void SurrogateModel::normalizeDataTest(void){
 
 
 void SurrogateModel::updateAuxilliaryFields(void){
-
-
 
 
 }
@@ -483,14 +481,13 @@ void SurrogateModel::tryOnTestData(void) const{
 
 		  mat results(numberOfTestSamples,numberOfEntries);
 
-		  vec std_y =  data.getOutputStdVector(); vec mean_y =  data.getOutputMeanVector();
 
 		  mat basis = getPodBasis();
 		  vec mean_vec1(length);
 		  vec variance_vec1(length);
 
-	 	  vec meanvector = readOutputMeanVector();
-		  vec stdvector  = readOutputStdVector();
+	 	  rowvec meanvector = readOutputMeanVector();
+	 	  rowvec stdvector  = readOutputStdVector();
 
 		  for(unsigned int i=0; i<numberOfTestSamples; i++){
 
@@ -503,11 +500,13 @@ void SurrogateModel::tryOnTestData(void) const{
 
 		  	  for (unsigned int j = 0; j< rank; j++ ){                // recover the full state solution
 
+		  		 fTilde(j) = fTilde(j)*stdvector(j) + meanvector(j);   // map back to original space
+
 		  		 mean_vec1 = mean_vec1 + basis.col(j)*(fTilde(j));
 
 		  	  }
 
-		  	  mean_vec1 = mean_vec1 % stdvector + meanvector;          // original prediction mean
+		  	 // mean_vec1 = mean_vec1 % stdvector + meanvector;          // original prediction mean
 
 		  	  rowvec sample(numberOfEntries);
 		  	  copyRowVector(sample,x);
@@ -539,9 +538,9 @@ void SurrogateModel::tryOnTestData(void) const{
 
                       }
 
-		 	     }
+		  }
 
-		         cout << "The mean relative mean squared error is " << mean(mse) <<  endl;
+		         cout << "The total mean relative mean squared error is " << mean(mse) <<  endl;
 	}
 
 }

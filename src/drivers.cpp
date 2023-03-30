@@ -1011,7 +1011,7 @@ void RoDeODriver::setOptimizationFeatures(Optimizer &optimizationStudy) const{
 	optimizationStudy.setMaximumNumberOfIterations(nFunctionEvals);
 
 
-	int nIterationsForEIMaximization = configKeys.getConfigKeyIntValue("DIMENSION")* 100000;
+	int nIterationsForEIMaximization = configKeys.getConfigKeyIntValue("DIMENSION")* 10000;
 
 	if(configKeys.ifConfigKeyIsSet("NUMBER_OF_ITERATIONS_FOR_EXPECTED_IMPROVEMENT_MAXIMIZATION")){
 
@@ -1147,8 +1147,10 @@ Optimizer RoDeODriver::setOptimizationStudy(void) {
 	int dim = configKeys.getConfigKeyIntValue("DIMENSION");
 
 	Optimizer optimizationStudy(name, dim, type);
+
 	vec lb = configKeys.getConfigKeyVectorDoubleValue("LOWER_BOUNDS");
 	vec ub = configKeys.getConfigKeyVectorDoubleValue("UPPER_BOUNDS");
+
 
 	optimizationStudy.setBoxConstraints(lb,ub);
 
@@ -1156,7 +1158,7 @@ Optimizer RoDeODriver::setOptimizationStudy(void) {
 
 	optimizationStudy.setFileNameDesignVector(dvFilename);
 
-	ObjectiveFunction objFunc = setObjectiveFunction();  //  Definition of objective function
+	ObjectiveFunction objFunc = setObjectiveFunction();     //  Definition of objective function
 
 	optimizationStudy.addObjectFunction(objFunc);
 
@@ -1169,10 +1171,7 @@ Optimizer RoDeODriver::setOptimizationStudy(void) {
 
 	}
 
-
-
 	return optimizationStudy;
-
 
 }
 
@@ -1419,7 +1418,6 @@ void RoDeODriver::runSurrogateModelTest(void){
 
 	surrogateTest.performSurrogateModelTest();
 
-
 }
 
 
@@ -1433,6 +1431,7 @@ int RoDeODriver::runDriver(void){
 
 
 		std::cout<<"\n################################## STARTING SURROGATE MODEL TEST ##################################\n";
+
 		runSurrogateModelTest();
 
 		std::cout<<"\n################################## FINISHED SURROGATE MODEL TEST ##################################\n";
@@ -1447,12 +1446,14 @@ int RoDeODriver::runDriver(void){
 
 		if(configKeys.ifFeatureIsOn("GENERATE_ONLY_SAMPLES")){
 			std::cout<<"\n################################## GENERATING DoE SAMPLES ########################\n";
+
 			generateDoESamples();
 
 			return 0;
 		}
 
 		std::cout<<"\n################################## STARTING DoE ##################################\n";
+
 		runDoE();
 
 		std::cout<<"\n################################## FINISHED DoE ##################################\n";
@@ -1464,6 +1465,7 @@ int RoDeODriver::runDriver(void){
 	if(isProblemTypeOptimization(problemType)){
 
 		std::cout<<"\n################################## STARTING Optimization ##################################\n";
+
 		runOptimization();
 
 		std::cout<<"\n################################## FINISHED Optimization ##################################\n";
@@ -1472,13 +1474,8 @@ int RoDeODriver::runDriver(void){
 	}
 
 
-
-
-
 	std::cout<<"ERROR: PROBLEM_TYPE is unknown!\n";
 	abort();
-
-
 
 }
 

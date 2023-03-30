@@ -348,31 +348,7 @@ Exporting potential of boxes grid to CSV..
 --- --- ---Time = 0.450000 minutes--- --- ---
 FDM e-coating log
 solver version: v2.1.0_dev31
-(2022-12-15 2:9:36)
-################################
-
-starting simulation...
-air bubble result file: Inputs/result.hdf5
-Alsim air bubble threshold not set. Using default value of: 10.000000mm3
-Alsim air bubbles limit time not set. Air bubbles will not be ignored after a certain time.
-Particle Generator is used to generate particles:
- The Solver Continues after Particle Generation:
-The inverval time used for outputing the result files: 1
-The inverval time used for outputing the fine result files: 1
-Outputing the potential on the cathode: 1
-Outputing debug data not set. Using default value of: 1
-The thickness model has not been set. Using the default value of: 0
-The cl platform ID has not been set. Using the default value of: 0
-Material file name not set. Using single material property as specified.
- Generate Particles Begin:
-Generating particles for adiabatic boundary...
-Generating particles for adiabatic boundary finished.
-Generating particles for moving adiabatic element boundary...
-Generating particles for moving adiabatic element boundary finished.
-Generating particles for cathode boundary...
-FDM e-coating log
-solver version: v2.1.0_dev31
-(2022-12-15 2:10:27)
+(2022-12-15 3:17:10)
 ################################
 
 starting simulation...
@@ -399,7 +375,7 @@ Generating particles for anode boundary...
 Generating particles for anode boundary finished.
 --- --- --- ---...updating dense fluid grid cells...
 --- --- --- ---...finished updating dense fluid grid cells.
---- --- ---...end SubdivideGridIntoBoxes after 0.016000 seconds
+--- --- ---...end SubdivideGridIntoBoxes after 0.017000 seconds
 
 --- --- ---...end AddNewBox after 0.003000 seconds
 
@@ -414,10 +390,10 @@ mark cathode cells inside for unstructured grid done.
 --- --- --- ---...finished updating unstructured fluid grid cells.
 Mark Unstructured Grid Cells done.
 
-start InitializeCells at (2022-12-15 2:10:35)
-finished for loop at (2022-12-15 2:10:35)
-finished ComputeCorrespondingFluidCells at (2022-12-15 2:10:35)
-finished RemoveCellsWithoutFluidNeighbor at (2022-12-15 2:10:35)
+start InitializeCells at (2022-12-15 3:17:17)
+finished for loop at (2022-12-15 3:17:18)
+finished ComputeCorrespondingFluidCells at (2022-12-15 3:17:18)
+finished RemoveCellsWithoutFluidNeighbor at (2022-12-15 3:17:18)
 Initialize Cathode grid done.
 
 number of cells: 
@@ -439,7 +415,7 @@ partciles written to the hdf file: 3798
 --- --- --- ---...updating coarse fluid grid cells...
 --- --- --- ---...finished updating coarse fluid grid cells.
 --- --- ---Starting to assemble coarse SoE...
---- --- ---...finished assembling coarse SoE after 0.016000 seconds
+--- --- ---...finished assembling coarse SoE after 0.015000 seconds
 Solving coarse equation system done.
 
 Mapping potential onto dense grid done.
@@ -464,7 +440,7 @@ Finished mapping gas bubble particles into the cathode grid...
 ......Alsim air bubble consideration completed.
 
 --- --- ---Starting to assemble unstructured SoE...
---- --- ---...finished assembling unstructured SoE after 0.216000 seconds
+--- --- ---...finished assembling unstructured SoE after 0.220000 seconds
 Solving unstructured equation system done.
 
 UpdateThicknessDense done.
@@ -474,10 +450,10 @@ UpdateThicknessCathode done.
 Exporting results to hdf5...
 Exporting results to vtu...
 Exporting potential of boxes grid to CSV..
---- ---...Output finished after 1.602000 seconds for step 1
---- Time iteration = 7.036000 seconds
---- Time overall = 0.279783 minutes
---- Estimated Time to Completion = 0.234533 minutes
+--- ---...Output finished after 0.659000 seconds for step 1
+--- Time iteration = 5.776000 seconds
+--- Time overall = 0.251067 minutes
+--- Estimated Time to Completion = 0.192533 minutes
 --- Step 291.000000 finished
 
 ---Step ID: 2
@@ -490,13 +466,13 @@ Exporting potential of boxes grid to CSV..
 --- --- --- ---...updating coarse fluid grid cells...
 --- --- --- ---...finished updating coarse fluid grid cells.
 --- --- ---Starting to assemble coarse SoE...
---- --- ---...finished assembling coarse SoE after 0.019000 seconds
+--- --- ---...finished assembling coarse SoE after 0.012000 seconds
 Solving coarse equation system done.
 
 Mapping potential onto dense grid done.
 
 --- --- ---Starting to assemble dense SoE...
---- --- ---...finished assembling dense SoE after 0.032000 seconds
+--- --- ---...finished assembling dense SoE after 0.029000 seconds
 Solving dense equation system done.
 
 Moving boxes particles...
@@ -515,7 +491,7 @@ Finished mapping gas bubble particles into the cathode grid...
 ......Alsim air bubble consideration completed.
 
 --- --- ---Starting to assemble unstructured SoE...
---- --- ---...finished assembling unstructured SoE after 0.236000 seconds
+--- --- ---...finished assembling unstructured SoE after 0.269000 seconds
 Solving unstructured equation system done.
 
 UpdateThicknessDense done.
@@ -525,16 +501,40 @@ UpdateThicknessCathode done.
 Exporting results to hdf5...
 Exporting results to vtu...
 Exporting potential of boxes grid to CSV..
---- ---...Output finished after 1.944000 seconds for step 2
---- Time iteration = 4.940000 seconds
---- Time overall = 0.362150 minutes
---- Estimated Time to Completion = 0.082333 minutes
+--- ---...Output finished after 0.676000 seconds for step 2
+--- Time iteration = 3.182000 seconds
+--- Time overall = 0.304133 minutes
+--- Estimated Time to Completion = 0.053033 minutes
 --- Step 294.000000 finished
 
---- --- ---Time = 0.350000 minutes--- --- ---
+--- --- ---Time = 0.300000 minutes--- --- ---
 FDM e-coating log
 solver version: v2.1.0_dev31
-(2022-12-15 2:14:10)
+(2022-12-15 3:20:18)
+################################
+
+starting simulation...
+air bubble result file: Inputs/result.hdf5
+Alsim air bubble threshold not set. Using default value of: 10.000000mm3
+Alsim air bubbles limit time not set. Air bubbles will not be ignored after a certain time.
+Particle Generator is used to generate particles:
+ The Solver Continues after Particle Generation:
+The inverval time used for outputing the result files: 1
+The inverval time used for outputing the fine result files: 1
+Outputing the potential on the cathode: 1
+Outputing debug data not set. Using default value of: 1
+The thickness model has not been set. Using the default value of: 0
+The cl platform ID has not been set. Using the default value of: 0
+Material file name not set. Using single material property as specified.
+ Generate Particles Begin:
+Generating particles for adiabatic boundary...
+Generating particles for adiabatic boundary finished.
+Generating particles for moving adiabatic element boundary...
+Generating particles for moving adiabatic element boundary finished.
+Generating particles for cathode boundary...
+FDM e-coating log
+solver version: v2.1.0_dev31
+(2022-12-15 3:29:19)
 ################################
 
 starting simulation...
@@ -561,7 +561,7 @@ Generating particles for anode boundary...
 Generating particles for anode boundary finished.
 --- --- --- ---...updating dense fluid grid cells...
 --- --- --- ---...finished updating dense fluid grid cells.
---- --- ---...end SubdivideGridIntoBoxes after 0.039000 seconds
+--- --- ---...end SubdivideGridIntoBoxes after 0.023000 seconds
 
 --- --- ---...end AddNewBox after 0.003000 seconds
 
@@ -576,30 +576,35 @@ mark cathode cells inside for unstructured grid done.
 --- --- --- ---...finished updating unstructured fluid grid cells.
 Mark Unstructured Grid Cells done.
 
-start InitializeCells at (2022-12-15 2:14:17)
-finished for loop at (2022-12-15 2:14:17)
-finished ComputeCorrespondingFluidCells at (2022-12-15 2:14:17)
-FDM e-coating log
-solver version: v2.1.0_dev31
-(2022-12-15 2:14:35)
-################################
+start InitializeCells at (2022-12-15 3:29:26)
+finished for loop at (2022-12-15 3:29:26)
+finished ComputeCorrespondingFluidCells at (2022-12-15 3:29:27)
+finished RemoveCellsWithoutFluidNeighbor at (2022-12-15 3:29:27)
+Initialize Cathode grid done.
 
-starting simulation...
-air bubble result file: Inputs/result.hdf5
-Alsim air bubble threshold not set. Using default value of: 10.000000mm3
-Alsim air bubbles limit time not set. Air bubbles will not be ignored after a certain time.
-Particle Generator is used to generate particles:
- The Solver Continues after Particle Generation:
-The inverval time used for outputing the result files: 1
-The inverval time used for outputing the fine result files: 1
-Outputing the potential on the cathode: 1
-Outputing debug data not set. Using default value of: 1
-The thickness model has not been set. Using the default value of: 0
-The cl platform ID has not been set. Using the default value of: 0
-Material file name not set. Using single material property as specified.
- Generate Particles Begin:
-Generating particles for adiabatic boundary...
-Generating particles for adiabatic boundary finished.
-Generating particles for moving adiabatic element boundary...
-Generating particles for moving adiabatic element boundary finished.
-Generating particles for cathode boundary...
+number of cells: 
+coarse: 42500
+dense: 73745
+boxes: 260673
+cathode: 27232
+The alsim file path: /home/cheng/Desktop/induheat/testCases/FCA_high_thickness/Inputs/result.hdf5
+The initial ALSIM rotation: 0.000000, 0.000000, 180.000000
+The initial ALSIM translation: 1.881000, 0.000000, -2.688000
+partciles written to the hdf file: 3798
+---Step ID: 1
+---Dt: 3.000000
+--- --- ---Mark coarse grid cells...
+--- --- --- ---...start adiabtic
+--- --- --- ---...end adiabtic
+--- --- --- ---...start adiabtic moving elements
+--- --- --- ---...end adiabtic moving elements
+--- --- --- ---...updating coarse fluid grid cells...
+--- --- --- ---...finished updating coarse fluid grid cells.
+--- --- ---Starting to assemble coarse SoE...
+--- --- ---...finished assembling coarse SoE after 0.014000 seconds
+Solving coarse equation system done.
+
+Mapping potential onto dense grid done.
+
+--- --- ---Starting to assemble dense SoE...
+--- --- ---...finished assembling dense SoE after 0.031000 seconds

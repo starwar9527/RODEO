@@ -44,18 +44,20 @@
 #include "test_functions.hpp"
 #include "optimization.hpp"
 #include "lhs.hpp"
+
 #define ARMA_DONT_PRINT_ERRORS
 #include <armadillo>
 
-
 using namespace arma;
 
+
+// Optimizer::Optimizer(){};
 
 Optimizer::Optimizer(std::string nameTestcase, int numberOfOptimizationParams, std::string problemType){
 
 	/* RoDeO does not allow problems with too many optimization parameters */
 
-	if(numberOfOptimizationParams > 100){
+	if(numberOfOptimizationParams > 300){
 
 		std::cout<<"ERROR: Problem dimension of the optimization is too large!"<<std::endl;
 		abort();
@@ -73,13 +75,9 @@ Optimizer::Optimizer(std::string nameTestcase, int numberOfOptimizationParams, s
 	upperBoundsForEIMaximization.zeros(dimension);
 	upperBoundsForEIMaximization.fill(1.0/dimension);
 
-
-	iterMaxEILoop = dimension*100000;
-
+	iterMaxEILoop = dimension*10000;
 
 	setProblemType(problemType);
-
-
 
 }
 
@@ -488,8 +486,6 @@ void Optimizer::visualizeOptimizationHistory(void) const{
 		fprintf(in, "\n");
 
 	}
-
-
 }
 
 
@@ -597,6 +593,8 @@ void Optimizer::addPenaltyToExpectedImprovementForConstraints(CDesignExpectedImp
 		estimateConstraints(designCalculated);
 
 		for (unsigned int i=0; i< numberOfConstraints ; i++){    // Created by Kai
+
+			// cout << "i-th probability is " << designCalculated.probability_con(i) << endl;
 
 			designCalculated.valueExpectedImprovement = designCalculated.valueExpectedImprovement*designCalculated.probability_con(i);   // Compute the constrained (g(x) > 0) Expected improvement function
 
@@ -798,9 +796,56 @@ void Optimizer::findTheGlobalOptimalDesign(void){
 
 }
 
+
 /* These designs (there can be more than one) are found by maximizing the expected
  *  Improvement function and taking the constraints into account
  */
+
+double Optimizer::Evaluate(vec dv){
+
+	CDesignExpectedImprovement designToBeTried(dimension,numberOfConstraints);
+
+	designToBeTried.dv = dv.t();
+
+	objFun.calculateExpectedImprovement(designToBeTried);
+
+	addPenaltyToExpectedImprovementForConstraints(designToBeTried);
+
+	return -designToBeTried.valueExpectedImprovement;
+
+};
+
+/*
+void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
+
+	 assert(ifSurrogatesAreInitialized);
+
+	 theMostPromisingDesigns.clear();
+
+	 CDesignExpectedImprovement designWithMaxEI(dimension,numberOfConstraints);
+
+     rowvec initial_dv;
+
+     initial_dv.zeros(dimension);
+
+     initial_dv = (lowerBoundsForEIMaximization.t() + upperBoundsForEIMaximization.t())/2;   // initial value of design parameter
+
+     // SA<> SA_optimizer(ExponentialSchedule(),100000, 1000., 1000, 100, 1e-10, 3, 1.5, 0.5, 0.3);
+
+     // SA_optimizer.Optimize(*this, initial_dv);
+
+     LBestPSO s(200, lowerBoundsForEIMaximization.t(), upperBoundsForEIMaximization.t(), 300000, 400, 1e-30, 2.05, 2.05);
+
+     const double result = s.Optimize(*this, initial_dv);
+
+     cout << "optimal design " <<  result << endl;
+
+     designWithMaxEI.dv = initial_dv;
+
+	 theMostPromisingDesigns.push_back(designWithMaxEI);
+
+}*/
+
 
 void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 
@@ -814,13 +859,13 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 
      initial_dv.zeros(dimension);
 
-     initial_dv = (lowerBounds.t()+upperBounds.t())/2;   // initial value of design parameter
+     initial_dv = (lowerBoundsForEIMaximization.t()+upperBoundsForEIMaximization.t())/2;   // initial value of design parameter
 
      designWithMaxEI.dv = initial_dv;
 
  #pragma omp parallel for
 
-	for(unsigned int iterEI = 0; iterEI <iterMaxEILoop; iterEI++ ){   // global search
+     	for(unsigned int iterEI = 0; iterEI < 2*iterMaxEILoop; iterEI++ ){   // global search
 
 		CDesignExpectedImprovement designToBeTried(dimension,numberOfConstraints);
 
@@ -846,6 +891,7 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 
 	}
 
+/*
 	#pragma omp parallel for
 
 	for(unsigned int iterEI = 0; iterEI <iterMaxEILoop; iterEI++ ){             // local search
@@ -856,7 +902,7 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 
 		objFun.calculateExpectedImprovement(designToBeTried);
 
-		addPenaltyToExpectedImprovementForConstraints(designToBeTried);          // Modified by Kai
+		addPenaltyToExpectedImprovementForConstraints(designToBeTried);
 
 		// cout << " Expected improvement value is " << designToBeTried.valueExpectedImprovement<< endl;
 
@@ -872,10 +918,11 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 #endif
 		}
 
-	}
-
+	}*/
 
 	theMostPromisingDesigns.push_back(designWithMaxEI);
+
+  //  cout << "optimal design " <<  designWithMaxEI.valueExpectedImprovement << endl;
 
 }
 
@@ -920,7 +967,7 @@ rowvec Optimizer::calculateEIGradient(CDesignExpectedImprovement &currentDesign)
 
 		double EIplus = currentDesign.valueExpectedImprovement;
 
-		currentDesign.dv(i) -= 2*epsilon;
+		currentDesign.dv(i) -= epsilon;
 
 		objFun.calculateExpectedImprovement(currentDesign);
 
@@ -942,6 +989,30 @@ rowvec Optimizer::calculateEIGradient(CDesignExpectedImprovement &currentDesign)
 #endif
 
 	return gradient;
+}
+
+
+CDesignExpectedImprovement Optimizer::local_search(CDesignExpectedImprovement & initialDesign) {
+
+
+	mat dv;  dv.zeros(dimension,1);
+
+	dv.col(0) = initialDesign.dv.t();
+
+	CDesignExpectedImprovement bestDesign = initialDesign;
+
+	// cout << "initial objective is " << initialDesign.valueExpectedImprovement << endl;
+
+	boxmin(dv,lowerBoundsForEIMaximization, upperBoundsForEIMaximization);
+
+    bestDesign.dv = getOptimal_dv().t();
+
+	bestDesign.valueExpectedImprovement = - getOptimal_obj();
+
+	// cout << "optimal objective is " << bestDesign.valueExpectedImprovement << endl;
+
+	return bestDesign;
+
 }
 
 
@@ -1030,11 +1101,11 @@ CDesignExpectedImprovement Optimizer::MaximizeEIGradientBased(CDesignExpectedImp
 
 	} /* end of gradient-search loop */
 
-
 	return bestDesign;
 
-
 }
+
+
 void Optimizer::prepareOptimizationHistoryFile(void) const{
 
 	std::string header;
@@ -1086,7 +1157,7 @@ void Optimizer::EfficientGlobalOptimization(void){
 	/* main loop for optimization */
 
 	unsigned int simulationCount = 0;
-	unsigned int iterOpt=0;
+	unsigned int iterOpt = 0;
 
 	initializeSurrogates();
 
@@ -1117,25 +1188,38 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 		}*/
 
-		 start = clock();
+		/* start = clock();
 
 		    findTheMostPromisingDesign();    // find the optimal next point with maximal EI
 
-	        finish = clock();
+	     finish = clock();
 
 		 cout << "The time for finding most promising design point is " << (double)(finish-start)/CLOCKS_PER_SEC  <<endl;
 
+		 CDesignExpectedImprovement optimizedDesignGradientBased1 = MaximizeEIGradientBased(theMostPromisingDesigns.at(0));  // Need further revision
 
-		// CDesignExpectedImprovement optimizedDesignGradientBased = MaximizeEIGradientBased(theMostPromisingDesigns.at(0));  // Need further revision
+		 CDesignExpectedImprovement optimizedDesign = local_search(theMostPromisingDesigns.at(0));    // use hooke-jeeves algorithm for local search
 
-	      CDesignExpectedImprovement optimizedDesignGradientBased = theMostPromisingDesigns.at(0);
+	     CDesignExpectedImprovement optimizedDesignGradientBased = theMostPromisingDesigns.at(0); */
 
 
-#if 0
-		optimizedDesignGradientBased.print();
-#endif
+		CDesignExpectedImprovement optimizedDesign(dimension,numberOfConstraints);
 
-		rowvec best_dvNorm = optimizedDesignGradientBased.dv;
+		 for(unsigned int k=0; k< 10; k++){
+
+			  findTheMostPromisingDesign();
+
+			  CDesignExpectedImprovement optimizedDesign_k = local_search(theMostPromisingDesigns.at(0));    // use hooke-jeeves algorithm for local search
+
+			  if(optimizedDesign_k.valueExpectedImprovement > optimizedDesign.valueExpectedImprovement){
+
+				  optimizedDesign = optimizedDesign_k;
+			  }
+
+		  }
+
+
+		rowvec best_dvNorm = optimizedDesign.dv;
 
 		rowvec best_dv = normalizeRowVectorBack(best_dvNorm, lowerBounds, upperBounds);
 
@@ -1152,6 +1236,7 @@ void Optimizer::EfficientGlobalOptimization(void){
 		Design currentBestDesign(best_dv);
 
 		currentBestDesign.setNumberOfConstraints(numberOfConstraints);
+
 		currentBestDesign.saveDesignVector(designVectorFileName);
 
 		/* now make a simulation for the most promising design */
@@ -1412,16 +1497,214 @@ void Optimizer::performDoE(unsigned int howManySamples, DoE_METHOD methodID){
 
 void Optimizer::displayMessage(std::string inputString) const{
 
-
 	if(ifDisplay){
 
 		std::cout<<inputString<<"\n";
 
+	}
+}
+
+// hooke jeeves algorithm
+
+void Optimizer::boxmin(mat dv, vec dv_l, vec dv_u){
+
+	vec obj_value = ones(num);
+
+    dv_cur  = dv;
+    obj_cur = obj_value;
+
+	dv_lb  = dv_l;    //  lower bound
+	dv_ub  = dv_u;    //  upper bound
+
+	//#pragma omp parallel for
+
+	for (unsigned int kk=0; kk<num; kk++){      // Multi-starts
+
+	  start(dv.col(kk),dv_lb,dv_ub,kk);
+
+	  int dim = dimension;
+
+	  int kmax;
+
+	  if (dimension < 2)
+	      { kmax = 2;}
+      else
+	      { kmax = std::min(dim,4);}
+
+	  for (unsigned int k = 0; k < kmax; k++){  // Iterate for kmax times
+
+	   vec dv1 = dv_cur.col(kk);
+
+	   explore(dv_cur.col(kk),obj_cur(kk),kk);
+
+	   move(dv1,dv_cur.col(kk),obj_cur(kk),kk);
+
+	   // cout << "current likelihood is " << likelihood_cur(kk) << endl;
+
+	 }
 
 	}
 
+	obj_value = get_obj();
+	dv = get_dv();
+
+	uword i = obj_value.index_min();
+
+	obj_optimal = obj_value(i);
+	dv_optimal  = dv.col(i);
 
 }
 
+void Optimizer::start(vec dv_in1, vec dv_lb, vec dv_ub, int kk){
+
+	  vec m = linspace(1,dimension,dimension)/(dimension+2);
+
+	  increment = zeros(dimension);
+
+	  for (unsigned int k = 0; k < dimension; k++){
+		  increment(k) = pow(2,m(k));
+	   }
+
+	  ind_increment = find(increment != 1);
+
+	  dv_cur.col(kk) = dv_in1;
+
+	  obj_cur(kk) = Evaluate(dv_cur.col(kk));
+
+
+	  numberOfIteration = 0;
+
+      hyperoptimizationHistory = zeros(dimension+2,200*dimension);
+
+	  hyperoptimizationHistory.col(numberOfIteration) = join_cols(dv_cur.col(kk), vec {obj_cur(kk), 1.0} );
+
+}
+
+void Optimizer::explore(vec dv_1, double obj_1, int kk){
+
+	unsigned int j; double DD;  unsigned int atbd;
+
+    dv_cur.col(kk) = dv_1; obj_cur(kk) = obj_1;
+
+	for (unsigned int k = 0; k < size(ind_increment,0); k++){
+
+	   j = ind_increment(k);
+	   dv_par = dv_cur.col(kk);
+       DD = increment(j);
+
+       if (dv_cur(j,kk) == dv_ub(j)){
+
+    	   atbd = 1;
+    	   dv_par(j) =  dv_cur(j,kk)/sqrt(DD); }
+
+       else if (dv_cur(j,kk) == dv_lb(j)){
+
+    	   atbd = 1;
+    	   dv_par(j) =  dv_cur(j,kk)*sqrt(DD); }
+
+       else  {
+
+    	   atbd = 0;
+    	   dv_par(j) = std::min(dv_ub(j),dv_cur(j,kk)*DD);
+       }
+
+       obj = Evaluate(dv_par);
+       numberOfIteration++;
+       hyperoptimizationHistory.col(numberOfIteration)= join_cols(dv_par, vec {obj, 2});
+
+       if (obj < obj_cur(kk)){
+            obj_cur(kk) = obj;
+            dv_cur.col(kk) = dv_par;  }
+       else  {
+
+    	    hyperoptimizationHistory(dimension+1,numberOfIteration)= -2;
+
+    	   if (!atbd) {
+    		    dv_par(j) = std::max(dv_lb(j),dv_cur(j,kk)/DD);
+    	        obj = Evaluate(dv_par);
+
+    	        numberOfIteration++;
+    	        hyperoptimizationHistory.col(numberOfIteration) = join_cols(dv_par, vec {obj, 2});
+
+    	        if (obj < obj_cur(kk)){
+    	        	obj_cur(kk) = obj;
+    	        	dv_cur.col(kk) = dv_par;  }
+    	        else
+    	            hyperoptimizationHistory(dimension+1,numberOfIteration)= -2;
+    	    }
+	     }
+	  }
+
+}
+
+void Optimizer::move(vec dv_old,vec dv_new, double obj_new, int kk){
+
+	   vec v  = dv_new/dv_old;
+	   vec v1 = v-ones(dimension,1);
+
+       if (v1.is_zero()){
+
+    	   vec ind = linspace(1,dimension,dimension);
+    	   ind(dimension-1) = 0;
+
+    	   for (unsigned int k = 0; k < dimension; k++){
+    	  	    increment(k) = pow(increment(ind(k)),0.2);
+    	    }
+
+    	   obj_cur(kk) = obj_new;
+    	   dv_cur.col(kk) = dv_new;
+
+            return ;
+        }
+
+        unsigned int rept = 1;   obj_cur(kk) = obj_new;  dv_cur.col(kk) = dv_new;
+
+        while (rept){
+
+		   dv_par = min(join_rows(dv_ub,max(join_rows(dv_lb,dv_new % v),1)),1);
+		   obj = Evaluate(dv_par);
+		   numberOfIteration++;
+		   hyperoptimizationHistory.col(numberOfIteration)= join_cols(dv_par, vec { obj, 3});
+
+		   if (obj < obj_cur(kk)){
+			   dv_cur.col(kk) = dv_par;
+			   obj_cur(kk) = obj;
+			   v = v % v;
+		   }
+
+		   else {
+			   hyperoptimizationHistory(dimension+1,numberOfIteration)= -3;
+			   rept = 0;
+
+		   }
+
+		   if (size(find(dv_par - dv_ub),0)+size(find(dv_par - dv_ub),0) < 2*dimension)
+			    rept  =  0;
+        }
+
+         vec ind = linspace(1,dimension,dimension);
+         ind(dimension-1) = 0;
+
+         for (unsigned int k = 0; k < dimension; k++){
+          	 increment(k) = pow(increment(ind(k)),0.25);
+          }
+}
+
+mat Optimizer::get_dv(void) {
+	return dv_cur;
+}
+
+vec Optimizer::getOptimal_dv(void) {
+	return dv_optimal;
+}
+
+
+vec Optimizer::get_obj(void) {
+	return obj_cur;
+}
+
+double Optimizer::getOptimal_obj(void){
+	return obj_optimal;
+}
 
 

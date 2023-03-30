@@ -56,8 +56,6 @@ double population_overall_max = -10E14;
 int population_overall_max_tread_id = -1;
 
 
-
-
 KrigingModel::KrigingModel():SurrogateModel(){}
 
 
@@ -672,8 +670,6 @@ void KrigingModel::interpolateWithVariance_vec(rowvec xp,vec &ftildeOutput,vec &
 
 	}
 
-	//cout << "predict MSE is " << sigmaSquared << endl;
-
 }
 
 /*double KrigingModel::computeCorrelation(rowvec x_i, rowvec x_j) const {
@@ -788,8 +784,8 @@ void KrigingModel::train(void){
 
 	unsigned int dim = data.getDimension();
 
-	vec hyper_l = 0.0005*dim*ones(dim,1);
-	vec hyper_u = 5*dim*ones(dim,1);
+	vec hyper_l = 0.0001*dim*ones(dim,1);
+	vec hyper_u = 10*dim*ones(dim,1);
 
 	num = 10;   // Multiple starts
 
@@ -896,7 +892,7 @@ void KrigingModel::start(vec hyper_in, vec hyper_l, vec hyper_u, int kk){
 
 	  hyper_cur.col(kk) = hyper_in;
 
-	  likelihood_cur(kk) = likelihood_function(hyper_cur.col(kk));  //
+	  likelihood_cur(kk) = likelihood_function(hyper_cur.col(kk));
 
 	  numberOfIteration = 0;
       hyperoptimizationHistory = zeros(dim+2,200*dim);

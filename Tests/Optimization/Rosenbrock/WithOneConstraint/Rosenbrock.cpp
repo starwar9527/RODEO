@@ -6,7 +6,7 @@
 using namespace arma;
 using namespace std;
 
-double Rosenbrock10(double *x) {
+double Rosenbrock5(double *x) {
 
 	double temp = 0.0;
 

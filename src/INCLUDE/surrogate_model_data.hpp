@@ -67,14 +67,18 @@ private:
 
     double mean_y = 0;
 	double std_y = 1;
-	vec mean_y_vec;
-	vec std_y_vec;
+
+	// vec mean_y_vec;
+	// vec std_y_vec;
+
+	rowvec mean_basiscoefficient;
+	rowvec std_basiscoefficient;
 
     mat pod_basis;
     mat pod_basiscoefficient;
-    vec singularvalue;
+    vec eigenvalue;
 
-    double threshold =  0.999;
+    double threshold =  0.99999;
     int rank;
 
 	mat XrawTest;
@@ -158,8 +162,9 @@ public:
 
 	double getOutputMean(void) const;
 	double getOutputStd(void) const;
-	vec getOutputMeanVector(void) const;
-	vec getOutputStdVector(void) const;
+
+	rowvec getOutputMeanVector(void) const;
+	rowvec getOutputStdVector(void) const;
 
 	mat getPodBasis(void) const;
 	mat getPodBasisCoefficients(void) const;

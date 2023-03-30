@@ -19,7 +19,7 @@ double Rosenbrock10(double *x) {
 	return temp;
 }
 
-vec constraint(double *x){          // g(x,t) = (sqrt(sum(x²)))*t+x1*x2*x3; t =  [0,1]
+vec constraint(double *x){          // g(x,t) = ((sum(x)))*t-x1*x2*x3; t =  [0,1]
 
 	int m = 1000;
     double sum = 0;
@@ -28,21 +28,22 @@ vec constraint(double *x){          // g(x,t) = (sqrt(sum(x²)))*t+x1*x2*x3; t =
 	vec t = linspace(0,m-1,m);
 
 	 for(int i=0; i<10; i++){
-        sum = sum + x[i]*x[i];
+        sum = sum + x[i];
 	 }
 
-	 sum = sqrt(sum);
+	// sum = sqrt(sum);
 
 	 vec output = zeros(m);
 
 	 for(int i=0; i< m; i++){
-		 output(i) = sum*t(i)/m + x[0]*x[1]*x[2];
+		 // output(i) = sum*t(i)/m - x[0]*x[1]*x[2];
+		 output(i) = sum*t(i)/m - x[0];
      }
 
 	 return output;
 }
 
-vec constraint2(double *x){         // g(x,t) = (sqrt(sum(x²)))*t+x1*x2*x3; t =  [0,1]
+vec constraint2(double *x){         // g(x,t) = ((sum(x)))*t+x1*x2*x3; t =  [0,1]
 
 	int m = 3000;
 	double sum = 0;
@@ -51,15 +52,16 @@ vec constraint2(double *x){         // g(x,t) = (sqrt(sum(x²)))*t+x1*x2*x3; t =
 	vec t = linspace(0,m-1,m);
 
 	 for(int i=0; i<10; i++){
-	        sum = sum + x[i]*x[i];
+	        sum = sum + x[i];
 	 }
 
-	 sum = sqrt(sum);
+	// sum = sqrt(sum);
 
 	 vec output = zeros(m);
 
 	 for(int i=0; i< m; i++){
-		 output(i) = sum*t(i)/m + x[0]*x[1]*x[2];
+		// output(i) = sum*t(i)/m + x[0]*x[1]*x[2];
+		 output(i) = sum*t(i)/m + x[0];
 	  }
 
 	return output;

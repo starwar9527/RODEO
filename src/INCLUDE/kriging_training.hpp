@@ -124,7 +124,7 @@ public:
 	void train(void);
 	double interpolateWithGradients(rowvec x) const ;
 	double interpolate(rowvec x) const ;
-	vec interpolate_vec(rowvec x) const ;
+	vec    interpolate_vec(rowvec x) const ;
 
 	void interpolateWithVariance(rowvec xp,double *f_tilde,double *ssqr) const;
 	void interpolateWithVariance_vec(rowvec xp,vec &f_tilde, vec &ssqr) const;
@@ -142,8 +142,6 @@ public:
 	void setLinearRegressionOff(void);
 
 	void setTheta(vec theta);
-	//vec getGamma(void) const;
-	//void setGamma(vec gamma);
 
 	void resetDataObjects(void);
 	void resizeDataObjects(void);

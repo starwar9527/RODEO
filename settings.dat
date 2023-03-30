@@ -1,6 +1,6 @@
 # current working directory
-WORKING_DIRECTORY=/home/cheng/Desktop/RODEO/Tests/Optimization/Induheat
+WORKING_DIRECTORY=/home/cheng/Desktop/induheat/testCases/FCA_high_thickness_optimization
 # directory for the python scripts
-PYTHON_DIRECTORY=/home/cheng/Desktop/RODEO/python
+PYTHON_DIRECTORY=/home/cheng/Desktop/RODEO-master/python
 # name of the configuration file
 CONFIGURATION_FILE=Induheat.cfg

@@ -19,7 +19,7 @@ double Rosenbrock10(double *x) {
 	return temp;
 }
 
-vec constraint(double *x){          // g(x,t) = sum(x)*t; t =  [0,1]
+vec constraint(double *x){          // g(x,t) = sum(x)*t+5Rosenbrock.cpp; t =  [0,1]
 
 	int m = 1000;
     double sum = 0;
@@ -32,7 +32,7 @@ vec constraint(double *x){          // g(x,t) = sum(x)*t; t =  [0,1]
 	 }
      // cout << sum*t << endl;
 
-	 return sum*t/m;
+	 return sum*t/m + 5;
 }
 
 

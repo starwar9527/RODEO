@@ -289,21 +289,18 @@ void SurrogateModelData::pod_ROM(void){
 
 	svd_econ(U, s, V, y_vec);
 
-	singularvalue = s;
+	eigenvalue = s%s;
 
-	rank = 1;
+	//rank = 1;
 
 	for (unsigned int i=0; i<numberOfSamples; i++){
 
-	   double ratio = sum(singularvalue.subvec(0,i))/sum(singularvalue);
+	   double ratio = sum(eigenvalue.subvec(0,i))/sum(eigenvalue);
 
-	   // cout << " The ratio  is " << ratio  << endl;
 
         if (ratio > threshold){
-        	break;
-        }
-        else {
         	rank = i+1;
+        	break;
         }
 
 	 }
@@ -312,7 +309,19 @@ void SurrogateModelData::pod_ROM(void){
 
     pod_basiscoefficient = y_vec.t()*pod_basis;
 
-   // cout << "snapshots are " << y_vec << endl;
+    mean_basiscoefficient = mean(pod_basiscoefficient,0);
+
+    std_basiscoefficient  = stddev(pod_basiscoefficient,0,0);
+
+
+    for (unsigned int i=0; i < rank; i++){
+
+    	  pod_basiscoefficient.col(i) = (pod_basiscoefficient.col(i) - mean_basiscoefficient(i))/std_basiscoefficient(i);  // normalize the POD coefficient
+
+    }
+
+  //   cout << "mean_basiscoefficient " << mean_basiscoefficient << endl;
+  //   cout << " std_basiscoefficient " << std_basiscoefficient << endl;
 
 	cout << " The proper orthogonal decomposition mode number is " << rank << endl;
 
@@ -414,16 +423,17 @@ double SurrogateModelData::getOutputStd(void) const{
 
 }
 
-vec SurrogateModelData::getOutputMeanVector(void) const{
+rowvec SurrogateModelData::getOutputMeanVector(void) const{
 
-	return mean_y_vec;
+	// return mean_y_vec;
+	return mean_basiscoefficient;
 
 }
 
-vec SurrogateModelData::getOutputStdVector(void) const{
+rowvec SurrogateModelData::getOutputStdVector(void) const{
 
-	return std_y_vec;
-
+	//return std_y_vec;
+	return std_basiscoefficient;
 }
 
 
@@ -501,13 +511,11 @@ void SurrogateModelData::normalizeSampleOutput(void){
 
 	assert(boxConstraints.areBoundsSet());
 
-	mean_y_vec.zeros(constraintLength); std_y_vec.ones(constraintLength);
-
-	vec mm = mean(y_vec,1);
+	// mean_y_vec.zeros(constraintLength); std_y_vec.ones(constraintLength);
 
 	if (ifVectorOutput){
 
-		mean_y_vec = mean(y_vec,1); std_y_vec = stddev(y_vec,0,1);
+		/*mean_y_vec = mean(y_vec,1); std_y_vec = stddev(y_vec,0,1);
 
 		for (unsigned int i=0; i<  mean_y_vec.size(); i++){
 
@@ -521,7 +529,7 @@ void SurrogateModelData::normalizeSampleOutput(void){
 
 			}
 
-		}
+		}*/
 
 		pod_ROM();  // proper orthogonal decomposition based reduced order model
 
