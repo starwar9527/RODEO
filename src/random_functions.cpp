@@ -86,9 +86,6 @@ rowvec generateRandomRowVector(vec lb, vec ub){
 
 	for(unsigned int i=0; i<dim; i++) {
 
-	// cout << i << "-th lb is " << lb(i) << endl;
-    // cout << i << "-th ub is " << ub(i) << endl;
-
 		assert(lb(i) <= ub(i));
 		x(i) = generateRandomDouble(lb(i), ub(i));
 	}

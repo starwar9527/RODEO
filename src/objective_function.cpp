@@ -840,18 +840,30 @@ void ObjectiveFunction::interpolateWithVariance(rowvec x, double *mean, double *
 		  surrogate->interpolateWithVariance_vec(x, mean_vec, variance_vec);
 
 		  mat basis = getPodBasis();
+
 		  rowvec meanvector = surrogate->readOutputMeanVector();
 		  rowvec stdvector  = surrogate->readOutputStdVector();
 
 		  for (unsigned int i = 0; i< rank; i++ ){       // recover the full state solution
 
-			  mean_vec(i) = mean_vec(i)*stdvector(i) + meanvector(i);
+			  if (stdvector(i) != 0){
 
-			  variance_vec(i) = variance_vec(i)*stdvector(i)*stdvector(i);
+			    mean_vec(i) = mean_vec(i)*stdvector(i) + meanvector(i);
 
-		      mean_vec1 = mean_vec1 + basis.col(i)*(mean_vec(i));
+			    variance_vec(i) = variance_vec(i)*stdvector(i)*stdvector(i);
 
-		      variance_vec1 = variance_vec1 + (basis.col(i) % basis.col(i))*(variance_vec(i));
+			  }
+			  else {
+
+				  mean_vec(i) = mean_vec(i) + meanvector(i);
+
+				  variance_vec(i) = variance_vec(i)*stdvector(i)*stdvector(i);
+
+			  }
+
+			  mean_vec1 = mean_vec1 + basis.col(i)*(mean_vec(i));
+
+			  variance_vec1 = variance_vec1 + (basis.col(i) % basis.col(i))*(variance_vec(i));
 
 		  }
 
@@ -891,7 +903,9 @@ void ObjectiveFunction::interpolateWithVariance(rowvec x, double *mean, double *
 
 		    *mean = mean_vec1(ind);  *variance = variance_vec1(ind);
 
-		   //  cout << " predict value is " <<  *mean << endl;
+		    // cout << " predict value is " <<  *mean << endl;
+		    // cout << " predict variance is " <<  *variance << endl;
+
 
 	  }else {
 

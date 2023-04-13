@@ -481,7 +481,6 @@ void SurrogateModel::tryOnTestData(void) const{
 
 		  mat results(numberOfTestSamples,numberOfEntries);
 
-
 		  mat basis = getPodBasis();
 		  vec mean_vec1(length);
 		  vec variance_vec1(length);
@@ -498,9 +497,21 @@ void SurrogateModel::tryOnTestData(void) const{
 
 			  mean_vec1.zeros();   variance_vec1.zeros();
 
-		  	  for (unsigned int j = 0; j< rank; j++ ){                // recover the full state solution
+			  // cout << " mean vector " << meanvector <<  endl;
+			  // cout << " std vector "  << stdvector <<  endl;
+			  //cout << " rank "  << rank <<  endl;
 
-		  		 fTilde(j) = fTilde(j)*stdvector(j) + meanvector(j);   // map back to original space
+		  	  for (unsigned int j = 0; j< rank; j++ ){                     // recover the full state solution
+
+		  		 if (stdvector(j) != 0){
+
+		  			 fTilde(j) = fTilde(j)*stdvector(j) + meanvector(j);   // map back to original space
+
+		  		 }else {
+
+		  			 fTilde(j) = fTilde(j) + meanvector(j);                // map back to original space
+
+		  		 }
 
 		  		 mean_vec1 = mean_vec1 + basis.col(j)*(fTilde(j));
 
@@ -515,7 +526,7 @@ void SurrogateModel::tryOnTestData(void) const{
 
 		   }
 
-		        output.printMessage("Saving surrogate test results in the file: surrogateTest.csv");
+		         output.printMessage("Saving surrogate test results in the file: surrogateTest.csv");
 
 		 	     saveMatToCVSFile(results,"surrogateTest.csv");
 
@@ -540,7 +551,7 @@ void SurrogateModel::tryOnTestData(void) const{
 
 		  }
 
-		         cout << "The total mean relative mean squared error is " << mean(mse) <<  endl;
+		         cout << "The total relative mean squared error is " << mean(mse) <<  endl;
 	}
 
 }

@@ -397,7 +397,9 @@ void KrigingModel::updateAuxilliaryFields(void){
 
 		   vec theta = Kriging_weights_vec[i];
 
-		   	correlationMatrix_vec[i] = correlationfunction.corrbiquadspline_kriging(X,theta);
+		   //  	correlationMatrix_vec[i] = correlationfunction.corrbiquadspline_kriging(X,theta);
+
+		     correlationMatrix_vec[i] = correlationfunction.corrgaussian_kriging(X,theta);
 
 		   	/* Cholesky decomposition R = LDL^T */
 
@@ -448,7 +450,9 @@ void KrigingModel::updateAuxilliaryFields(void){
 
 			vec theta = Kriging_weights;
 
-			correlationMatrix = correlationfunction.corrbiquadspline_kriging(X,theta);
+			// correlationMatrix = correlationfunction.corrbiquadspline_kriging(X,theta);
+
+			correlationMatrix = correlationfunction.corrgaussian_kriging(X,theta);
 
 			/* Cholesky decomposition R = LDL^T */
 
@@ -515,8 +519,6 @@ vec KrigingModel::computeCorrelationVector(rowvec x, vec theta) const{
 
 	vec r(numberOfSamples);
 	mat X = data.getInputMatrix();
-
-	//vec theta = Kriging_weights;
 
 	for(unsigned int i=0;i<numberOfSamples;i++){
 
@@ -672,19 +674,21 @@ void KrigingModel::interpolateWithVariance_vec(rowvec xp,vec &ftildeOutput,vec &
 
 }
 
-/*double KrigingModel::computeCorrelation(rowvec x_i, rowvec x_j) const {
+
+double KrigingModel::computeCorrelation(rowvec x_i, rowvec x_j,vec theta) const {
 
 	unsigned int dim = data.getDimension();
 	double sum = 0.0;
-	for (unsigned int k = 0; k < dim; k++) {
 
-		sum += theta(k) * pow(fabs(x_i(k) - x_j(k)), gamma(k));
-		//sum += theta(k) * pow(fabs(x_i(k) - x_j(k)), 2);
+	for (unsigned int k = 0; k < dim; k++) {
+	   //sum += theta(k) * pow(fabs(x_i(k) - x_j(k)), gamma(k));
+		sum += theta(k) * pow(fabs(x_i(k) - x_j(k)), 2);
 	}
 
 	return exp(-sum);
-}*/
+}
 
+/*
 double KrigingModel::computeCorrelation(rowvec x_i, rowvec x_j,vec theta) const {
 
 	unsigned int dim = data.getDimension();
@@ -706,7 +710,7 @@ double KrigingModel::computeCorrelation(rowvec x_i, rowvec x_j,vec theta) const 
 
 	return prod(ss);
 }
-
+*/
 
 void KrigingModel::computeCorrelationMatrix(void)  {
 
@@ -745,7 +749,9 @@ double KrigingModel::likelihood_function(vec theta){
 
 	vec y = data.getOutputVector();
 
-	correlationMatrix = correlationfunction.corrbiquadspline_kriging(X,theta);
+	// correlationMatrix = correlationfunction.corrbiquadspline_kriging(X,theta);
+
+	 correlationMatrix = correlationfunction.corrgaussian_kriging(X,theta);   // using Guassian kernel
 
 	upperDiagonalMatrix = chol(correlationMatrix);
 

@@ -154,8 +154,8 @@ protected:
 	bool ifParameterBoundsAreSet = false;
 	bool ifMultilevel = false;
 	bool ifDefinitionIsSet = false;
-	bool ifVectorOutput = false;   // for vector output
-	int constraint_length = 1;         // for vector constraint
+	bool ifVectorOutput = false;        // for vector output
+	long constraint_length = 1;         // for vector constraint
 
 	void readOutputWithoutMarkers(Design &outputDesignBuffer) const;
 

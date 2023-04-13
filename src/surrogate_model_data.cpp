@@ -100,25 +100,25 @@ void SurrogateModelData::setGradientsOff(void){
 	ifDataHasGradients = false;
 }
 
-void SurrogateModelData::setVectorOutputOn(void){   // Kai
+void SurrogateModelData::setVectorOutputOn(void){
 
 	ifVectorOutput = true;
 
 }
 
-void SurrogateModelData::setVectorOutputOff(void){  // Kai
+void SurrogateModelData::setVectorOutputOff(void){
 
 	ifVectorOutput = false;
 
 }
 
-void SurrogateModelData::setConstraintLength(int length){  // Kai
+void SurrogateModelData::setConstraintLength(int length){
 
 	constraintLength = length;
 }
 
 
-int SurrogateModelData::getConstraintLength(void) const {  // Kai
+int SurrogateModelData::getConstraintLength(void) const {
 
 	return constraintLength;
 
@@ -316,14 +316,22 @@ void SurrogateModelData::pod_ROM(void){
 
     for (unsigned int i=0; i < rank; i++){
 
-    	  pod_basiscoefficient.col(i) = (pod_basiscoefficient.col(i) - mean_basiscoefficient(i))/std_basiscoefficient(i);  // normalize the POD coefficient
+    	  if (std_basiscoefficient(i) != 0) {
 
+    	    pod_basiscoefficient.col(i) = (pod_basiscoefficient.col(i) - mean_basiscoefficient(i))/std_basiscoefficient(i);  // normalize the POD coefficient
+
+    	  }
+    	  else{
+
+    	    pod_basiscoefficient.col(i) = pod_basiscoefficient.col(i) - mean_basiscoefficient(i);  // normalize the POD coefficient
+
+    	   }
     }
 
   //   cout << "mean_basiscoefficient " << mean_basiscoefficient << endl;
   //   cout << " std_basiscoefficient " << std_basiscoefficient << endl;
 
-	cout << " The proper orthogonal decomposition mode number is " << rank << endl;
+	cout << "The proper orthogonal decomposition mode number is " << rank << endl;
 
 }
 

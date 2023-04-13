@@ -393,7 +393,7 @@ void Optimizer::estimateConstraints(CDesignExpectedImprovement &design) const{
 
 		constraintIt++;
 
-		// cout << "design variable is " << x << endl;
+
 	}
 }
 
@@ -873,9 +873,11 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 
 		objFun.calculateExpectedImprovement(designToBeTried);
 
+		// cout << " Expected improvement value is " << designToBeTried.valueExpectedImprovement<< endl;
+
 		addPenaltyToExpectedImprovementForConstraints(designToBeTried);
 
-		// cout << " Expected improvement value is " << designToBeTried.valueExpectedImprovement<< endl;
+	    // cout << "Constrained Expected improvement value is " << designToBeTried.valueExpectedImprovement<< endl;
 
 #if 0
 		designToBeTried.print();
@@ -1182,6 +1184,8 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 		}
 
+		cout << "Model training is done... " << endl;
+
 		/*if(iterOpt%10 == 0){
 
 			zoomInDesignSpace();
@@ -1202,14 +1206,21 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 	     CDesignExpectedImprovement optimizedDesignGradientBased = theMostPromisingDesigns.at(0); */
 
+		cout << "Find the most promising design parameter... " << endl;
 
 		CDesignExpectedImprovement optimizedDesign(dimension,numberOfConstraints);
 
-		 for(unsigned int k=0; k< 10; k++){
+		optimizedDesign.generateRandomDesignVector(lowerBoundsForEIMaximization, upperBoundsForEIMaximization); // give a random initial value
+
+		for(unsigned int k=0; k< 10; k++){
+
+			//  cout << "Iterating... " << k <<  endl;
 
 			  findTheMostPromisingDesign();
 
 			  CDesignExpectedImprovement optimizedDesign_k = local_search(theMostPromisingDesigns.at(0));    // use hooke-jeeves algorithm for local search
+
+			 // cout << "Iterating... " << k << "improvement is " << optimizedDesign_k.valueExpectedImprovement <<  endl;
 
 			  if(optimizedDesign_k.valueExpectedImprovement > optimizedDesign.valueExpectedImprovement){
 
@@ -1217,6 +1228,14 @@ void Optimizer::EfficientGlobalOptimization(void){
 			  }
 
 		  }
+
+		cout << "The most promising design parameter has been found... " << endl;
+
+		if (optimizedDesign.valueExpectedImprovement < 10e-15){
+
+			cout << "The constraint function may be not well-defined. Please check it !" << endl;
+
+		}
 
 
 		rowvec best_dvNorm = optimizedDesign.dv;

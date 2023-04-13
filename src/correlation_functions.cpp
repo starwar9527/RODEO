@@ -416,14 +416,18 @@ mat Correlationfunction::corrgaussian_kriging(mat &X, vec theta){
 
 	mat location  = join_cols(ij.rows(idx),repmat(o,1,2));
 
-	cout << size(location) << endl;
+	//cout << size(location) << endl;
+
 	vec correlation  = join_cols(r(idx),ones<vec>(m)+mu);
-	cout << size(correlation) << endl;
+	
+	// cout << size(correlation) << endl;
 
 	sp_mat R(conv_to<umat>::from(location.t()),correlation.t());
 
 	correlationMatrix = R + R.t()-diagmat(R);
-	 return correlationMatrix;
+
+	return correlationMatrix;
+
  }
 
 mat Correlationfunction::corrgaussian_kriging_vec(mat &xtest, mat &X, vec theta){

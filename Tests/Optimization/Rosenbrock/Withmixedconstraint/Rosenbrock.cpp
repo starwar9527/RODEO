@@ -37,7 +37,7 @@ vec constraint(double *x){          // g(x,t) = ((sum(x)))*t-x1*x2*x3; t =  [0,1
 
 	 for(int i=0; i< m; i++){
 		 // output(i) = sum*t(i)/m - x[0]*x[1]*x[2];
-		 output(i) = sum*t(i)/m - x[0];
+		 output(i) = sum*t(i)/m + x[0]+ x[1];
      }
 
 	 return output;
