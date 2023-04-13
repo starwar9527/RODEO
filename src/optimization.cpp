@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <unistd.h>
+#include <omp.h>
 #include <cassert>
 #include "auxiliary_functions.hpp"
 #include "kriging_training.hpp"
@@ -862,6 +863,19 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
      initial_dv = (lowerBoundsForEIMaximization.t()+upperBoundsForEIMaximization.t())/2;   // initial value of design parameter
 
      designWithMaxEI.dv = initial_dv;
+
+     int cores = omp_get_num_procs();
+
+     if (cores > 5){
+
+    	 omp_set_num_threads(cores-2);     // leave two cores fore other task.
+
+     }else {
+
+    	 omp_set_num_threads(cores);
+
+     }
+
 
  #pragma omp parallel for
 
