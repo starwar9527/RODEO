@@ -70,6 +70,8 @@ class Optimizer {
 
 	bool IfinitialValueForObjFunIsSet= false;
 
+	char* workpath;
+
 	Design globalOptimalDesign;
 
 	double initialobjectiveFunctionValue = 0.0;

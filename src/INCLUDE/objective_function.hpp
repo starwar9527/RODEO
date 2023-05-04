@@ -107,7 +107,7 @@ protected:
 	std::string fileNameOutputValueRead;  // file name for reading function value
 	std::string fileNameOutputGradRead;   // file name for reading function value
 
-	std::string readMarker;         // marker for data
+	std::string readMarker;
 	std::string readMarkerAdjoint;
 
 	std::string executableNameLowFi;
@@ -115,11 +115,11 @@ protected:
 	std::string fileNameInputReadLowFi;
 	std::string readMarkerLowFi;
 	std::string readMarkerAdjointLowFi;
-	std::string surrogatetype;  // Modified by Kai
+	std::string surrogatetype;
 	std::string fileNameTrainingDataForSurrogate;
 
-	double value = 0; // constraint threshold
-	int rank = 0;     // for vector output
+	double value = 0;   // constraint threshold
+	int rank = 0;       // for vector output
 
 	bool ifMarkerIsSet = false;
 	bool ifAdjointMarkerIsSet = false;
@@ -178,14 +178,14 @@ public:
 	KrigingModel     getSurrogateModel(void) const;
 	AggregationModel getSurrogateModelGradient(void) const;
 	MultiLevelModel  getSurrogateModelML(void) const;
-	GEKModel      getGEKModel(void) const;  // Modified by Kai
-	SGEKModel     getSGEKModel(void) const; // Modified by Kai
+	GEKModel      getGEKModel(void) const;
+	SGEKModel     getSGEKModel(void) const;
 
 	void setGradientOn(void);
 	void setGradientOff(void);
 
-	void setVectorOutputOn(void);   // created by kai
-	void setVectorOutputOff(void);  // created by kai
+	void setVectorOutputOn(void);
+	void setVectorOutputOff(void);
 	void setConstraintLength(int length);
 
 	mat getPodBasis(void) const;
@@ -210,6 +210,12 @@ public:
 
 		return name;
 	}
+
+	std::string getexecutableName(void) const{
+
+			return executableName;
+	}
+
 
 	std::string getsurrogatetype(void) const{  // Created by Kai
 

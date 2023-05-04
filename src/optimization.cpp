@@ -37,6 +37,7 @@
 #include <unistd.h>
 #include <omp.h>
 #include <cassert>
+#include <filesystem>
 #include "auxiliary_functions.hpp"
 #include "kriging_training.hpp"
 #include "aggregation_model.hpp"
@@ -784,6 +785,7 @@ void Optimizer::findTheGlobalOptimalDesign(void){
 	globalOptimalDesign.designParameters  = dv;
 	globalOptimalDesign.trueValue = bestSample(dimension);
 	globalOptimalDesign.objectiveFunctionValue = bestSample(dimension);
+
 	globalOptimalDesign.improvementValue = bestSample(sampleDim);
 
 	rowvec constraintValues(numberOfConstraints);
@@ -868,7 +870,7 @@ void Optimizer::findTheMostPromisingDesign(unsigned int howManyDesigns){
 
      if (cores > 5){
 
-    	 omp_set_num_threads(cores-2);     // leave two cores fore other task.
+    	 omp_set_num_threads(cores-2);     // leave two cores for other tasks.
 
      }else {
 
@@ -1181,6 +1183,28 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 	clock_t start, finish;
 
+	 char* buffer;
+
+	 /*
+	  if ((buffer = getcwd(NULL,0)) == NULL){
+
+		   cout << "ERROR: cannot read current working dictionary\n" << endl;
+		   abort();
+
+	  } else {
+
+	        workpath = buffer;
+	  }
+	  */
+
+	string command0 = "rm -r Optimal_results";
+	system(command0.c_str());
+
+    string folderpath = "Optimal_results";
+	string command = "mkdir " + folderpath;
+	system(command.c_str());
+
+
 	while(1){
 
 		iterOpt++;
@@ -1228,13 +1252,9 @@ void Optimizer::EfficientGlobalOptimization(void){
 
 		for(unsigned int k=0; k< 10; k++){
 
-			//  cout << "Iterating... " << k <<  endl;
-
 			  findTheMostPromisingDesign();
 
 			  CDesignExpectedImprovement optimizedDesign_k = local_search(theMostPromisingDesigns.at(0));    // use hooke-jeeves algorithm for local search
-
-			 // cout << "Iterating... " << k << "improvement is " << optimizedDesign_k.valueExpectedImprovement <<  endl;
 
 			  if(optimizedDesign_k.valueExpectedImprovement > optimizedDesign.valueExpectedImprovement){
 
@@ -1384,6 +1404,7 @@ void Optimizer::calculateImprovementValue(Design &d){
 
 		}
 
+		double currentoptimaldesign = globalOptimalDesign.objectiveFunctionValue;
 
 		if(optimizationType == "minimize"){
 
@@ -1392,6 +1413,8 @@ void Optimizer::calculateImprovementValue(Design &d){
 				d.improvementValue = initialobjectiveFunctionValue - d.objectiveFunctionValue;
 
 			}
+
+
 
 		}
 		if(optimizationType == "maximize"){
@@ -1405,8 +1428,23 @@ void Optimizer::calculateImprovementValue(Design &d){
 		}
 
 
-	}
+		  if (objFun.getexecutableName() == "FdmSolver"){
 
+
+			 if (d.improvementValue > globalOptimalDesign.improvementValue){
+
+				 //  string command0 = "rm -r Optimal_results";
+				 //  system(command0.c_str());
+				 //  std::filesystem::copy("Results", "Optimal_results");
+
+				 string command = "cp -R Results Optimal_results";
+				 system(command.c_str());
+
+			  }
+		 }
+
+
+	}
 
 }
 

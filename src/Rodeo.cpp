@@ -40,7 +40,6 @@
 #include "auxiliary_functions.hpp"
 #include "read_settings.hpp"
 #include "surrogate_model.hpp"
-
 #include "aggregation_model.hpp"
 #include "kriging_training.hpp"
 #include "polynomials.hpp"
@@ -51,6 +50,7 @@
 #ifdef UNIT_TESTS
 #include<gtest/gtest.h>
 #endif
+
 Rodeo_settings settings;
 
 
