@@ -45,6 +45,10 @@ old_mergeLib
 .ycm_extra_conf.py
 CMakeLists.txt.user
 
+# ignore some hidden files
+.cproject
+.project
+
 
 alsim/code/alsim/BuildInfo.xml
 alsim/code/alsim/simulator/include/CTemplateSimulatorBNAbs.hpp

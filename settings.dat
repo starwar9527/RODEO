@@ -1,6 +1,6 @@
 # current working directory
-WORKING_DIRECTORY=/home/cheng/Desktop/BemSolver/testCases/ecoating_area
+WORKING_DIRECTORY=/home/xinghua.song/Coding/song/github/RODEO/Tests/Optimization/Induheat/ecoating_area
 # directory for the python scripts
-PYTHON_DIRECTORY=/home/cheng/Desktop/RODEO-master/python
+PYTHON_DIRECTORY=/home/xinghua.song/Coding/song/github/RODEO/python
 # name of the configuration file
 CONFIGURATION_FILE=ecoating_area.cfg
